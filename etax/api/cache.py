@@ -221,12 +221,12 @@ def set_cached_form_detail(form_code: str, detail: dict):
 
 
 # Cache invalidation hooks
-def on_settings_update():
+def on_settings_update(doc, method=None):
 	"""Called when eTax Settings is updated"""
 	ETaxCache.invalidate_token()
 	frappe.cache.delete_value(CACHE_KEYS["settings"])
 
 
-def on_report_sync():
+def on_report_sync(doc=None, method=None):
 	"""Called after report sync"""
 	ETaxCache.invalidate_reports()
