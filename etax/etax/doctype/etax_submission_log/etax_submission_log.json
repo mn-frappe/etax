@@ -1,0 +1,118 @@
+{
+	"actions": [],
+	"allow_rename": 0,
+	"autoname": "format:ETAX-LOG-{####}",
+	"creation": "2024-12-16 10:00:00.000000",
+	"default_view": "List",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"report",
+		"report_no",
+		"action",
+		"column_break_main",
+		"status",
+		"timestamp",
+		"response_section",
+		"response_code",
+		"response_message",
+		"response_data"
+	],
+	"fields": [
+		{
+			"fieldname": "report",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Report",
+			"options": "eTax Report"
+		},
+		{
+			"fieldname": "report_no",
+			"fieldtype": "Int",
+			"label": "Report No"
+		},
+		{
+			"fieldname": "action",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Action",
+			"options": "Save\nSubmit\nSync\nRefresh"
+		},
+		{
+			"fieldname": "column_break_main",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Status",
+			"options": "Success\nFailed\nPending"
+		},
+		{
+			"fieldname": "timestamp",
+			"fieldtype": "Datetime",
+			"in_list_view": 1,
+			"label": "Timestamp"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "response_section",
+			"fieldtype": "Section Break",
+			"label": "API Response"
+		},
+		{
+			"fieldname": "response_code",
+			"fieldtype": "Int",
+			"label": "Response Code"
+		},
+		{
+			"fieldname": "response_message",
+			"fieldtype": "Small Text",
+			"label": "Response Message"
+		},
+		{
+			"fieldname": "response_data",
+			"fieldtype": "Code",
+			"label": "Response Data",
+			"options": "JSON"
+		}
+	],
+	"hide_toolbar": 0,
+	"index_web_pages_for_search": 1,
+	"links": [],
+	"modified": "2024-12-16 10:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "eTax",
+	"name": "eTax Submission Log",
+	"naming_rule": "Expression (old style)",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1
+		},
+		{
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Accounts Manager",
+			"share": 1
+		}
+	],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
+}

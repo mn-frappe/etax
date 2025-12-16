@@ -1,1 +1,1 @@
-eTax Mongolian Tax Reporting System for ERPNext
+eTax

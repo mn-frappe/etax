@@ -1,25 +1,20 @@
 app_name = "etax"
-app_title = "eTax Mongolian Tax Reporting System for ERPNext"
+app_title = "eTax"
 app_publisher = "Digital Consulting Service LLC (Mongolia)"
-app_description = "eTax Mongolian Tax Reporting System for ERPNext"
+app_description = "Electronic Tax Reporting for ERPNext - Mongolia Tax Authority (MTA) Integration"
 app_email = "dev@frappe.mn"
 app_license = "gpl-3.0"
+app_version = "1.0.0"
 
 # Apps
 # ------------------
 
-# required_apps = []
+required_apps = ["frappe", "erpnext"]
 
-# Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "etax",
-# 		"logo": "/assets/etax/logo.png",
-# 		"title": "eTax Mongolian Tax Reporting System for ERPNext",
-# 		"route": "/etax",
-# 		"has_permission": "etax.api.permission.has_app_permission"
-# 	}
-# ]
+# Installation hooks
+after_install = "etax.setup.install.after_install"
+before_uninstall = "etax.setup.install.before_uninstall"
+after_migrate = ["etax.setup.install.after_migrate"]
 
 # Includes in <head>
 # ------------------
@@ -82,8 +77,8 @@ app_license = "gpl-3.0"
 # Installation
 # ------------
 
-# before_install = "etax.install.before_install"
-# after_install = "etax.install.after_install"
+before_install = "etax.setup.install.before_uninstall"
+after_install = "etax.setup.install.after_install"
 
 # Uninstallation
 # ------------
@@ -153,7 +148,7 @@ app_license = "gpl-3.0"
 # 		"etax.tasks.all"
 # 	],
 # 	"daily": [
-# 		"etax.tasks.daily"
+# 		"etax.tasks.daily.run"
 # 	],
 # 	"hourly": [
 # 		"etax.tasks.hourly"
@@ -165,6 +160,12 @@ app_license = "gpl-3.0"
 # 		"etax.tasks.monthly"
 # 	],
 # }
+
+scheduler_events = {
+	"daily": [
+		"etax.tasks.daily.sync_reports_daily"
+	]
+}
 
 # Testing
 # -------

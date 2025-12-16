@@ -1,0 +1,214 @@
+{
+	"actions": [],
+	"allow_rename": 0,
+	"autoname": "field:tin",
+	"creation": "2024-12-16 10:00:00.000000",
+	"default_view": "List",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"entity_section",
+		"ent_id",
+		"tin",
+		"pin",
+		"column_break_ent",
+		"entity_name",
+		"ent_type",
+		"ent_type_name",
+		"status_section",
+		"ent_status",
+		"ent_status_name",
+		"column_break_status",
+		"is_confirmed",
+		"parent_id",
+		"branch_section",
+		"branch_code",
+		"branch_name",
+		"column_break_branch",
+		"sub_branch_code",
+		"sub_branch_name",
+		"permissions_section",
+		"agree_general_role_user",
+		"ebarimt_login"
+	],
+	"fields": [
+		{
+			"collapsible": 1,
+			"fieldname": "entity_section",
+			"fieldtype": "Section Break",
+			"label": "Entity Information"
+		},
+		{
+			"description": "Entity ID from eTax system",
+			"fieldname": "ent_id",
+			"fieldtype": "Int",
+			"in_standard_filter": 1,
+			"label": "Entity ID"
+		},
+		{
+			"description": "Taxpayer Identification Number",
+			"fieldname": "tin",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "TIN",
+			"reqd": 1,
+			"unique": 1
+		},
+		{
+			"description": "Registry Number (Personal ID)",
+			"fieldname": "pin",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Registry No (PIN)"
+		},
+		{
+			"fieldname": "column_break_ent",
+			"fieldtype": "Column Break"
+		},
+		{
+			"description": "Taxpayer/Organization name",
+			"fieldname": "entity_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Entity Name"
+		},
+		{
+			"description": "1 = Individual, 2 = Legal Entity",
+			"fieldname": "ent_type",
+			"fieldtype": "Int",
+			"in_standard_filter": 1,
+			"label": "Entity Type"
+		},
+		{
+			"description": "Entity type name",
+			"fieldname": "ent_type_name",
+			"fieldtype": "Data",
+			"label": "Entity Type Name"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "status_section",
+			"fieldtype": "Section Break",
+			"label": "Status"
+		},
+		{
+			"description": "2=Registered, 3=Pending removal, 4=Removed",
+			"fieldname": "ent_status",
+			"fieldtype": "Int",
+			"label": "Entity Status"
+		},
+		{
+			"fieldname": "ent_status_name",
+			"fieldtype": "Data",
+			"label": "Status Name"
+		},
+		{
+			"fieldname": "column_break_status",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"description": "Registration confirmed",
+			"fieldname": "is_confirmed",
+			"fieldtype": "Check",
+			"label": "Confirmed"
+		},
+		{
+			"description": "Parent company entity ID",
+			"fieldname": "parent_id",
+			"fieldtype": "Int",
+			"label": "Parent ID"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "branch_section",
+			"fieldtype": "Section Break",
+			"label": "Tax Office"
+		},
+		{
+			"fieldname": "branch_code",
+			"fieldtype": "Data",
+			"label": "Branch Code"
+		},
+		{
+			"fieldname": "branch_name",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"label": "Branch Name"
+		},
+		{
+			"fieldname": "column_break_branch",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "sub_branch_code",
+			"fieldtype": "Data",
+			"label": "Sub-Branch Code"
+		},
+		{
+			"fieldname": "sub_branch_name",
+			"fieldtype": "Data",
+			"label": "Sub-Branch Name"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "permissions_section",
+			"fieldtype": "Section Break",
+			"label": "Permissions"
+		},
+		{
+			"default": "0",
+			"description": "Has general accountant role",
+			"fieldname": "agree_general_role_user",
+			"fieldtype": "Check",
+			"label": "General Accountant"
+		},
+		{
+			"default": "0",
+			"description": "Registered in eBarimt system",
+			"fieldname": "ebarimt_login",
+			"fieldtype": "Check",
+			"label": "eBarimt Registered"
+		}
+	],
+	"hide_toolbar": 0,
+	"index_web_pages_for_search": 1,
+	"links": [],
+	"modified": "2024-12-16 10:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "eTax",
+	"name": "eTax Taxpayer",
+	"naming_rule": "By fieldname",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"write": 1
+		},
+		{
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Accounts Manager",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
+}

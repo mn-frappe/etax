@@ -1,0 +1,371 @@
+{
+	"actions": [],
+	"allow_rename": 0,
+	"autoname": "format:ETAX-RPT-{####}",
+	"creation": "2024-12-16 10:00:00.000000",
+	"default_view": "List",
+	"doctype": "DocType",
+	"editable_grid": 1,
+	"engine": "InnoDB",
+	"field_order": [
+		"report_info_section",
+		"report_no",
+		"report_id",
+		"tax_report_code",
+		"column_break_info",
+		"status",
+		"status_code",
+		"is_x_report",
+		"tax_type_section",
+		"tax_type_id",
+		"tax_type_code",
+		"tax_type_name",
+		"column_break_tax",
+		"form_no",
+		"period_section",
+		"period_year",
+		"period",
+		"period_name",
+		"column_break_period",
+		"return_begin_date",
+		"return_due_date",
+		"branch_section",
+		"branch_id",
+		"branch_code",
+		"branch_name",
+		"column_break_branch",
+		"sub_branch_id",
+		"sub_branch_code",
+		"sub_branch_name",
+		"taxpayer_section",
+		"ent_id",
+		"ent_name",
+		"column_break_tp",
+		"pin",
+		"submission_section",
+		"submitted_date",
+		"received_date",
+		"column_break_sub",
+		"received_emp",
+		"done_date",
+		"data_section",
+		"data_items",
+		"amended_from"
+	],
+	"fields": [
+		{
+			"collapsible": 1,
+			"fieldname": "report_info_section",
+			"fieldtype": "Section Break",
+			"label": "Report Information"
+		},
+		{
+			"description": "Report number from eTax system",
+			"fieldname": "report_no",
+			"fieldtype": "Int",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Report No"
+		},
+		{
+			"description": "Unique report identifier",
+			"fieldname": "report_id",
+			"fieldtype": "Data",
+			"label": "Report ID"
+		},
+		{
+			"description": "Tax report code (e.g., TT-11, TT-02)",
+			"fieldname": "tax_report_code",
+			"fieldtype": "Data",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Tax Report Code"
+		},
+		{
+			"fieldname": "column_break_info",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "New",
+			"description": "Current report status",
+			"fieldname": "status",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Status",
+			"options": "New\nSubmitted\nAssigned\nReturned\nReceived"
+		},
+		{
+			"description": "Status code from API",
+			"fieldname": "status_code",
+			"fieldtype": "Int",
+			"hidden": 1,
+			"label": "Status Code"
+		},
+		{
+			"default": "0",
+			"description": "X-Report for no business activity during the period",
+			"fieldname": "is_x_report",
+			"fieldtype": "Check",
+			"label": "X-Report (No Activity)"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "tax_type_section",
+			"fieldtype": "Section Break",
+			"label": "Tax Type"
+		},
+		{
+			"fieldname": "tax_type_id",
+			"fieldtype": "Int",
+			"label": "Tax Type ID"
+		},
+		{
+			"description": "Tax type code (e.g., 01010101)",
+			"fieldname": "tax_type_code",
+			"fieldtype": "Data",
+			"label": "Tax Type Code"
+		},
+		{
+			"description": "Tax type name in Mongolian",
+			"fieldname": "tax_type_name",
+			"fieldtype": "Data",
+			"label": "Tax Type Name"
+		},
+		{
+			"fieldname": "column_break_tax",
+			"fieldtype": "Column Break"
+		},
+		{
+			"description": "Form number for this tax type",
+			"fieldname": "form_no",
+			"fieldtype": "Int",
+			"label": "Form No"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "period_section",
+			"fieldtype": "Section Break",
+			"label": "Reporting Period"
+		},
+		{
+			"description": "Reporting year",
+			"fieldname": "period_year",
+			"fieldtype": "Int",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Year"
+		},
+		{
+			"description": "Reporting period (quarter: 1-4)",
+			"fieldname": "period",
+			"fieldtype": "Int",
+			"in_list_view": 1,
+			"label": "Period"
+		},
+		{
+			"description": "Period name (e.g., 1-р улирал)",
+			"fieldname": "period_name",
+			"fieldtype": "Data",
+			"label": "Period Name"
+		},
+		{
+			"fieldname": "column_break_period",
+			"fieldtype": "Column Break"
+		},
+		{
+			"description": "Reporting period start date",
+			"fieldname": "return_begin_date",
+			"fieldtype": "Date",
+			"label": "Period Start"
+		},
+		{
+			"description": "Report due date",
+			"fieldname": "return_due_date",
+			"fieldtype": "Date",
+			"label": "Due Date"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "branch_section",
+			"fieldtype": "Section Break",
+			"label": "Tax Office"
+		},
+		{
+			"fieldname": "branch_id",
+			"fieldtype": "Int",
+			"label": "Branch ID"
+		},
+		{
+			"fieldname": "branch_code",
+			"fieldtype": "Data",
+			"label": "Branch Code"
+		},
+		{
+			"description": "Tax office name",
+			"fieldname": "branch_name",
+			"fieldtype": "Data",
+			"label": "Branch Name"
+		},
+		{
+			"fieldname": "column_break_branch",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "sub_branch_id",
+			"fieldtype": "Int",
+			"label": "Sub-Branch ID"
+		},
+		{
+			"fieldname": "sub_branch_code",
+			"fieldtype": "Data",
+			"label": "Sub-Branch Code"
+		},
+		{
+			"fieldname": "sub_branch_name",
+			"fieldtype": "Data",
+			"label": "Sub-Branch Name"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "taxpayer_section",
+			"fieldtype": "Section Break",
+			"label": "Taxpayer"
+		},
+		{
+			"description": "Entity/Taxpayer ID",
+			"fieldname": "ent_id",
+			"fieldtype": "Int",
+			"label": "Entity ID"
+		},
+		{
+			"description": "Taxpayer/Organization name",
+			"fieldname": "ent_name",
+			"fieldtype": "Data",
+			"label": "Entity Name"
+		},
+		{
+			"fieldname": "column_break_tp",
+			"fieldtype": "Column Break"
+		},
+		{
+			"description": "Registry number",
+			"fieldname": "pin",
+			"fieldtype": "Data",
+			"label": "Registry No (PIN)"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "submission_section",
+			"fieldtype": "Section Break",
+			"label": "Submission Details"
+		},
+		{
+			"description": "Date report was submitted",
+			"fieldname": "submitted_date",
+			"fieldtype": "Datetime",
+			"label": "Submitted Date"
+		},
+		{
+			"description": "Date report was received by tax office",
+			"fieldname": "received_date",
+			"fieldtype": "Datetime",
+			"label": "Received Date"
+		},
+		{
+			"fieldname": "column_break_sub",
+			"fieldtype": "Column Break"
+		},
+		{
+			"description": "Tax officer who received the report",
+			"fieldname": "received_emp",
+			"fieldtype": "Data",
+			"label": "Received By"
+		},
+		{
+			"description": "Date processing was completed",
+			"fieldname": "done_date",
+			"fieldtype": "Datetime",
+			"label": "Done Date"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "data_section",
+			"fieldtype": "Section Break",
+			"label": "Report Data"
+		},
+		{
+			"description": "Report data items (tag values)",
+			"fieldname": "data_items",
+			"fieldtype": "Table",
+			"label": "Data Items",
+			"options": "eTax Report Data Item"
+		},
+		{
+			"fieldname": "amended_from",
+			"fieldtype": "Link",
+			"label": "Amended From",
+			"no_copy": 1,
+			"options": "eTax Report",
+			"print_hide": 1,
+			"read_only": 1
+		}
+	],
+	"hide_toolbar": 0,
+	"index_web_pages_for_search": 1,
+	"is_submittable": 1,
+	"links": [],
+	"modified": "2024-12-16 10:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "eTax",
+	"name": "eTax Report",
+	"naming_rule": "Expression (old style)",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"amend": 1,
+			"cancel": 1,
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1,
+			"submit": 1,
+			"write": 1
+		},
+		{
+			"amend": 1,
+			"cancel": 1,
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Accounts Manager",
+			"share": 1,
+			"submit": 1,
+			"write": 1
+		},
+		{
+			"create": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Accounts User",
+			"share": 1,
+			"write": 1
+		}
+	],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 1
+}
