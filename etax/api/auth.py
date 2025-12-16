@@ -162,6 +162,11 @@ class ETaxAuth:
 		SECURITY: Password is decrypted only for this request,
 		never logged or stored in plain text.
 		"""
+		# Initialize variables outside try block to avoid unbound errors
+		data = None
+		headers = None
+		timeout = 30
+		
 		try:
 			# Get credentials (password is decrypted here)
 			username = self.settings.username

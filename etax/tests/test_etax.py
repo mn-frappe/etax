@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# pyright: reportMissingImports=false, reportAttributeAccessIssue=false
+# pyright: reportMissingImports=false, reportAttributeAccessIssue=false, reportOptionalMemberAccess=false
 # Copyright (c) 2024, Digital Consulting Service LLC (Mongolia)
 # License: GNU General Public License v3
 
