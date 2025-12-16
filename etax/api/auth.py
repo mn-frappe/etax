@@ -52,11 +52,8 @@ class ETaxAuth:
 		"Production": "https://auth.itc.gov.mn/auth/realms/ITC"
 	}
 	
-	# OAuth2 client IDs per environment
-	CLIENT_IDS = {
-		"Staging": "etax-gui-test",
-		"Production": "etax-gui"
-	}
+	# OAuth2 client ID (same as eBalance/eBarimt - unified ITC client)
+	CLIENT_ID = "vatps"
 	
 	# Fixed OAuth2 parameters
 	GRANT_TYPE = "password"
@@ -100,13 +97,13 @@ class ETaxAuth:
 	
 	@property
 	def client_id(self):
-		"""Get OAuth2 client ID for current environment"""
-		return self.CLIENT_IDS.get(self.environment, self.CLIENT_IDS["Staging"])
+		"""Get OAuth2 client ID (vatps - same as eBalance/eBarimt)"""
+		return self.CLIENT_ID
 	
 	@property
 	def token_endpoint(self):
-		"""Get OAuth2 token endpoint via gateway (no path suffix needed)"""
-		return self.auth_url
+		"""Get OAuth2 token endpoint via gateway"""
+		return f"{self.auth_url}/protocol/openid-connect/token"
 	
 	@property
 	def token_endpoint_direct(self):
