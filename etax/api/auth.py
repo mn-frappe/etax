@@ -105,8 +105,13 @@ class ETaxAuth:
 	
 	@property
 	def token_endpoint(self):
-		"""Get OAuth2 token endpoint"""
-		return f"{self.auth_url}/protocol/openid-connect/token"
+		"""Get OAuth2 token endpoint via gateway (no path suffix needed)"""
+		return self.auth_url
+	
+	@property
+	def token_endpoint_direct(self):
+		"""Get direct OAuth2 token endpoint for fallback"""
+		return f"{self.auth_url_direct}/protocol/openid-connect/token"
 	
 	def get_token(self, force_refresh=False):
 		"""
@@ -157,15 +162,27 @@ class ETaxAuth:
 	def _load_stored_token(self):
 		"""Load token from settings if still valid"""
 		try:
-			stored_token = self.settings.get_password("access_token")
+			# Check if token_expiry exists first
 			stored_expiry = self.settings.token_expiry
+			if not stored_expiry:
+				return False
 			
-			if stored_token and stored_expiry:
-				expiry_dt = frappe.utils.get_datetime(stored_expiry)
-				if datetime.now() < (expiry_dt - timedelta(seconds=60)):
-					self._token = stored_token
-					self._token_expiry = expiry_dt
-					return True
+			expiry_dt = frappe.utils.get_datetime(stored_expiry)
+			if datetime.now() >= (expiry_dt - timedelta(seconds=60)):
+				# Token expired, don't bother loading
+				return False
+			
+			# Try to get stored token
+			try:
+				stored_token = self.settings.get_password("access_token")
+			except Exception:
+				# Password field might be empty or not set
+				return False
+			
+			if stored_token:
+				self._token = stored_token
+				self._token_expiry = expiry_dt
+				return True
 		except Exception:
 			pass
 		return False
@@ -237,7 +254,7 @@ class ETaxAuth:
 	
 	def _request_token_direct(self, data, headers, timeout):
 		"""Fallback: Request token directly from ITC server"""
-		direct_url = f"{self.auth_url_direct}/protocol/openid-connect/token"
+		direct_url = self.token_endpoint_direct
 		
 		try:
 			response = requests.post(
