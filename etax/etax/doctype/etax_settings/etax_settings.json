@@ -65,6 +65,8 @@
 			"label": "Connection"
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "environment_section",
 			"fieldtype": "Section Break",
 			"label": "Environment"
@@ -91,6 +93,8 @@
 			"label": "Enabled"
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "auth_section",
 			"fieldtype": "Section Break",
 			"label": "Authentication (ITC OAuth2)"
@@ -134,6 +138,8 @@
 			"label": "Organization RegNo"
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "api_section",
 			"fieldtype": "Section Break",
 			"label": "API Connection"
@@ -163,6 +169,7 @@
 		},
 		{
 			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "organization_section",
 			"fieldtype": "Section Break",
 			"label": "Organization Info (from API)"
@@ -206,6 +213,8 @@
 			"label": "Automation"
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "sync_section",
 			"fieldtype": "Section Break",
 			"label": "Report Sync"
@@ -243,6 +252,8 @@
 			"read_only": 1
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "auto_actions_section",
 			"fieldtype": "Section Break",
 			"label": "Auto Actions"
@@ -279,6 +290,8 @@
 			"label": "Advanced"
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "debug_section",
 			"fieldtype": "Section Break",
 			"label": "Debug & Logging"
@@ -309,6 +322,8 @@
 			"label": "Log Retention (days)"
 		},
 		{
+			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "performance_section",
 			"fieldtype": "Section Break",
 			"label": "Performance"
@@ -333,6 +348,7 @@
 		},
 		{
 			"collapsible": 1,
+			"collapsed": 1,
 			"fieldname": "token_section",
 			"fieldtype": "Section Break",
 			"label": "Token Status"
