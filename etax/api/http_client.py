@@ -8,12 +8,19 @@ eTax API - HTTP Client Module
 
 Handles all HTTP communication with eTax API.
 Includes NE-KEY header support required by all eTax endpoints.
+
+Performance optimizations:
+- Connection pooling via requests.Session
+- Automatic retry with exponential backoff
+- Response compression (gzip)
+- Keep-alive connections
 """
 
 import frappe
-import requests
 import json
+import time
 from typing import Optional
+from etax.api.pool import get_session
 
 
 class ETaxHTTPError(Exception):
@@ -50,6 +57,14 @@ class ETaxHTTPClient:
 			settings: eTax Settings doc or None
 		"""
 		self.settings = settings or self._get_settings()
+		self._session = None
+	
+	@property
+	def session(self):
+		"""Get pooled HTTP session for connection reuse"""
+		if self._session is None:
+			self._session = get_session()
+		return self._session
 	
 	def _get_settings(self):
 		"""Get eTax Settings singleton"""
@@ -229,18 +244,18 @@ eTax API Response:
 		
 		start_time = time.time()
 		try:
-			response = requests.get(
+			response = self.session.get(
 				url,
 				headers=request_headers,
 				params=params,
 				timeout=self.timeout
 			)
-		except requests.exceptions.Timeout:
-			raise ETaxHTTPError(f"Request timeout after {self.timeout}s", status_code=408)
-		except requests.exceptions.ConnectionError as e:
+		except Exception as e:
+			if "timeout" in str(e).lower():
+				raise ETaxHTTPError(f"Request timeout after {self.timeout}s", status_code=408)
 			raise ETaxHTTPError(f"Connection error: {str(e)}", status_code=503)
 		finally:
-			duration = round(time.time() - start_time, 2)
+			duration = round(time.time() - start_time, 3)
 		
 		self._log_response(response, duration)
 		
@@ -269,19 +284,19 @@ eTax API Response:
 		
 		start_time = time.time()
 		try:
-			response = requests.post(
+			response = self.session.post(
 				url,
 				json=data,
 				headers=request_headers,
 				params=params,
 				timeout=self.timeout
 			)
-		except requests.exceptions.Timeout:
-			raise ETaxHTTPError(f"Request timeout after {self.timeout}s", status_code=408)
-		except requests.exceptions.ConnectionError as e:
+		except Exception as e:
+			if "timeout" in str(e).lower():
+				raise ETaxHTTPError(f"Request timeout after {self.timeout}s", status_code=408)
 			raise ETaxHTTPError(f"Connection error: {str(e)}", status_code=503)
 		finally:
-			duration = round(time.time() - start_time, 2)
+			duration = round(time.time() - start_time, 3)
 		
 		self._log_response(response, duration)
 		

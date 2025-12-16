@@ -112,6 +112,11 @@ class ETaxAuth:
 		"""
 		Get valid access token, refreshing if necessary.
 		
+		Uses multi-level caching:
+		1. In-memory cache (fastest)
+		2. Redis cache (shared across workers)
+		3. Database storage (persistent)
+		
 		Args:
 			force_refresh: Force token refresh even if cached
 			
@@ -121,11 +126,21 @@ class ETaxAuth:
 		Raises:
 			ETaxAuthError: If authentication fails
 		"""
-		# Check cached token
+		# Level 1: In-memory cache
 		if not force_refresh and self._is_token_valid():
 			return self._token
 		
-		# Check stored token in settings
+		# Level 2: Redis cache
+		if not force_refresh:
+			from etax.api.cache import ETaxCache
+			cached_token = ETaxCache.get_token()
+			if cached_token:
+				self._token = cached_token.get("access_token")
+				import time
+				self._token_expiry = datetime.fromtimestamp(cached_token.get("expires_at", 0))
+				return self._token
+		
+		# Level 3: Database storage
 		if not force_refresh and self._load_stored_token():
 			return self._token
 		
@@ -248,6 +263,7 @@ class ETaxAuth:
 	def _process_token_response(self, token_data):
 		"""Process successful token response"""
 		access_token = token_data.get("access_token")
+		refresh_token = token_data.get("refresh_token")
 		expires_in = token_data.get("expires_in", 300)  # Default 5 minutes
 		
 		if not access_token:
@@ -260,7 +276,11 @@ class ETaxAuth:
 		self._token = access_token
 		self._token_expiry = expiry_dt
 		
-		# Store in settings
+		# Cache in Redis (for sharing across workers)
+		from etax.api.cache import ETaxCache
+		ETaxCache.set_token(access_token, expires_in, refresh_token)
+		
+		# Store in settings (persistent)
 		self._store_token(access_token, expiry_dt)
 		
 		return access_token
@@ -292,6 +312,10 @@ class ETaxAuth:
 		"""Clear cached and stored token"""
 		self._token = None
 		self._token_expiry = None
+		
+		# Clear Redis cache
+		from etax.api.cache import ETaxCache
+		ETaxCache.invalidate_token()
 		
 		try:
 			frappe.db.set_single_value("eTax Settings", "access_token", "")

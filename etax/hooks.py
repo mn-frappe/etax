@@ -132,13 +132,15 @@ after_install = "etax.setup.install.after_install"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+	"eTax Settings": {
+		"on_update": "etax.api.cache.on_settings_update"
+	},
+	"eTax Report": {
+		"after_insert": "etax.api.cache.on_report_sync",
+		"on_update": "etax.api.cache.on_report_sync"
+	}
+}
 
 # Scheduled Tasks
 # ---------------

@@ -6,7 +6,11 @@
 """
 eTax API Client
 
-Full implementation of eTax API (14 endpoints):
+Full implementation of eTax API (14 endpoints) with performance optimizations:
+- Connection pooling (reuse TCP connections)
+- Response caching (Redis)
+- Lazy loading
+- Bulk operations support
 
 User/Org Management:
 1. getUserOrgs - Get user's organizations
@@ -32,6 +36,11 @@ Sheet/Attachment Management:
 import frappe
 from etax.api.auth import ETaxAuth, ETaxAuthError
 from etax.api.http_client import ETaxHTTPClient, ETaxHTTPError
+from etax.api.cache import (
+	cached, ETaxCache, 
+	get_cached_orgs, set_cached_orgs,
+	get_cached_form_detail, set_cached_form_detail
+)
 
 
 class ETaxClient:
@@ -104,9 +113,14 @@ class ETaxClient:
 	# API 1: Get User Organizations
 	# =========================================================================
 	
-	def get_user_orgs(self):
+	def get_user_orgs(self, skip_cache=False):
 		"""
 		Get user's registered organizations (татвар төлөгчийн мэдээлэл).
+		
+		Cached for 1 hour (organizations rarely change).
+		
+		Args:
+			skip_cache: Skip cache and fetch fresh data
 		
 		Returns:
 			list: List of organizations with:
@@ -130,11 +144,23 @@ class ETaxClient:
 				}
 			}
 		"""
+		# Check cache first
+		cache_key = self.settings.org_regno or "default"
+		if not skip_cache:
+			cached_orgs = get_cached_orgs(cache_key)
+			if cached_orgs:
+				return cached_orgs
+		
 		# Note: getUserOrgs uses different base path (no /beta)
 		response = self.http.get(
 			"/user/getUserOrgs",
 			auth_header=self._get_auth_header()
 		)
+		
+		# Cache result
+		if response:
+			orgs_list = response if isinstance(response, list) else [response]
+			set_cached_orgs(cache_key, orgs_list)
 		
 		return response
 	
@@ -255,12 +281,14 @@ class ETaxClient:
 	# API 6: Get Form Detail/Structure
 	# =========================================================================
 	
-	def get_form_detail(self, form_no, tax_type_id, branch_id, year, period, ent_id=None):
+	def get_form_detail(self, form_no, tax_type_id, branch_id, year, period, ent_id=None, skip_cache=False):
 		"""
 		Get form structure/schema (маягтын загвар).
 		
 		This returns the complete form structure needed to render
 		and fill the tax report form dynamically.
+		
+		Cached for 24 hours (form structures rarely change).
 		
 		Args:
 			form_no: Form number
@@ -269,6 +297,7 @@ class ETaxClient:
 			year: Reporting year
 			period: Reporting period
 			ent_id: Entity/taxpayer ID
+			skip_cache: Skip cache and fetch fresh
 			
 		Returns:
 			dict: Form structure with:
@@ -277,6 +306,13 @@ class ETaxClient:
 				- sections: Form sections with cells
 				- validations: Validation rules
 		"""
+		# Check cache first (form structures are static)
+		cache_key = f"{form_no}:{tax_type_id}:{year}"
+		if not skip_cache:
+			cached_detail = get_cached_form_detail(cache_key)
+			if cached_detail:
+				return cached_detail
+		
 		ent_id = self._get_ent_id(ent_id)
 		
 		response = self.http.get(
@@ -292,7 +328,13 @@ class ETaxClient:
 			}
 		)
 		
-		return response.get("reportFormPass", {})
+		result = response.get("reportFormPass", {})
+		
+		# Cache result
+		if result:
+			set_cached_form_detail(cache_key, result)
+		
+		return result
 	
 	# =========================================================================
 	# API 7: Get Form Data
