@@ -174,12 +174,15 @@ class TestETaxAuth(FrappeTestCase):
 		self.assertIn("Staging", ETaxAuth.GATEWAY_PATHS)
 		self.assertIn("Production", ETaxAuth.GATEWAY_PATHS)
 	
-	def test_client_id_defined(self):
-		"""Client ID should be defined (vatps - same as eBalance/eBarimt)"""
+	def test_client_ids_defined(self):
+		"""Client IDs should be defined for both environments"""
 		from etax.api.auth import ETaxAuth
 		
-		self.assertEqual(ETaxAuth.CLIENT_ID, "vatps")
-		self.assertEqual(ETaxAuth.GRANT_TYPE, "password")
+		self.assertIn("Staging", ETaxAuth.CLIENT_IDS)
+		self.assertIn("Production", ETaxAuth.CLIENT_IDS)
+		self.assertEqual(ETaxAuth.CLIENT_IDS["Staging"], "etax-gui-test")
+		self.assertEqual(ETaxAuth.CLIENT_IDS["Production"], "etax-gui")
+		self.assertEqual(ETaxAuth.FALLBACK_CLIENT_ID, "vatps")
 
 
 class TestETaxHTTPClient(FrappeTestCase):
