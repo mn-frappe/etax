@@ -52,14 +52,9 @@ class ETaxAuth:
 		"Production": "https://auth.itc.gov.mn/auth/realms/ITC"
 	}
 	
-	# OAuth2 client IDs per environment (per official eTax documentation)
-	CLIENT_IDS = {
-		"Staging": "etax-gui-test",
-		"Production": "etax-gui"
-	}
-	
-	# Fallback client ID if eTax client not configured on gateway
-	FALLBACK_CLIENT_ID = "vatps"
+	# OAuth2 client ID - vatps is the unified ITC client
+	# Note: etax-gui-test/etax-gui from docs don't exist on ITC server
+	CLIENT_ID = "vatps"
 	
 	# Fixed OAuth2 parameters
 	GRANT_TYPE = "password"
@@ -74,7 +69,6 @@ class ETaxAuth:
 		self.settings = settings or self._get_settings()
 		self._token = None
 		self._token_expiry = None
-		self._client_id = None  # Will be set during auth
 	
 	def _get_settings(self):
 		"""Get eTax Settings singleton"""
@@ -104,10 +98,8 @@ class ETaxAuth:
 	
 	@property
 	def client_id(self):
-		"""Get OAuth2 client ID for current environment (per eTax docs)"""
-		if self._client_id:
-			return self._client_id
-		return self.CLIENT_IDS.get(self.environment, self.CLIENT_IDS["Staging"])
+		"""Get OAuth2 client ID (vatps - unified ITC client)"""
+		return self.CLIENT_ID
 	
 	@property
 	def token_endpoint(self):
@@ -197,8 +189,6 @@ class ETaxAuth:
 		"""
 		Request new token from ITC OAuth2 server via api.frappe.mn gateway.
 		
-		Tries official eTax client_id first, then falls back to vatps if not configured.
-		
 		SECURITY: Password is decrypted only for this request,
 		never logged or stored in plain text.
 		"""
@@ -216,11 +206,9 @@ class ETaxAuth:
 			
 			timeout = self.settings.timeout or 30
 			
-			# Try official eTax client_id first
-			official_client = self.CLIENT_IDS.get(self.environment, self.CLIENT_IDS["Staging"])
 			data = {
 				"grant_type": self.GRANT_TYPE,
-				"client_id": official_client,
+				"client_id": self.client_id,
 				"username": username,
 				"password": password
 			}
@@ -228,11 +216,11 @@ class ETaxAuth:
 			# Log request if debug mode (without password)
 			if self.settings.debug_mode:
 				frappe.log_error(
-					f"eTax Auth Request: {self.token_endpoint} | client_id: {official_client}",
+					f"eTax Auth Request: {self.token_endpoint} | client_id: {self.client_id}",
 					"eTax Auth Debug"
 				)
 			
-			# Try gateway with official client_id
+			# Request token via gateway
 			response = requests.post(
 				self.token_endpoint,
 				data=data,
@@ -241,37 +229,21 @@ class ETaxAuth:
 			)
 			
 			if response.status_code == 200:
-				self._client_id = official_client
 				token_data = response.json()
 				return self._process_token_response(token_data)
 			
-			# Check if client_id error - try fallback
+			# Parse error response
 			error_data = response.json() if response.content else {}
-			if error_data.get("error") == "invalid_client":
-				# Try fallback vatps client
-				if self.settings.debug_mode:
-					frappe.log_error(
-						f"eTax: {official_client} not found, trying vatps",
-						"eTax Auth Debug"
-					)
-				
-				data["client_id"] = self.FALLBACK_CLIENT_ID
-				response = requests.post(
-					self.token_endpoint,
-					data=data,
-					headers=headers,
-					timeout=timeout
-				)
-				
-				if response.status_code == 200:
-					self._client_id = self.FALLBACK_CLIENT_ID
-					token_data = response.json()
-					return self._process_token_response(token_data)
-			
-			# Both failed - parse error
 			error_msg = error_data.get("error_description", 
 				error_data.get("error", f"HTTP {response.status_code}"))
 			raise ETaxAuthError(f"Authentication failed: {error_msg}")
+			
+		except requests.exceptions.RequestException as e:
+			raise ETaxAuthError(f"Gateway connection failed: {str(e)}")
+		except ETaxAuthError:
+			raise
+		except Exception as e:
+			raise ETaxAuthError(f"Authentication error: {str(e)}")
 			
 		except requests.exceptions.RequestException as e:
 			raise ETaxAuthError(f"Gateway connection failed: {str(e)}")
