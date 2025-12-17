@@ -145,6 +145,10 @@ def add_to_integrations_workspace():
 	if modified:
 		workspace.save()
 		frappe.db.commit()
+		
+		# Clear bootinfo cache so changes appear without hard refresh
+		frappe.cache.delete_key("bootinfo")
+		
 		print("  ✓ Added eTax Settings to Integrations workspace (MN Settings section)")
 
 
