@@ -333,18 +333,19 @@ def get_signature_for_report(report_no):
     
     # Build report_data from doc
     report_data = {
-        "reportNo": report.report_no,
-        "taxTypeId": report.tax_type_id,
-        "branchId": report.branch_id,
-        "year": report.period_year,
-        "period": report.period,
-        "formNo": report.form_no
+        "reportNo": report.report_no,  # type: ignore
+        "taxTypeId": report.tax_type_id,  # type: ignore
+        "branchId": report.branch_id,  # type: ignore
+        "year": report.period_year,  # type: ignore
+        "period": report.period,  # type: ignore
+        "formNo": report.form_no  # type: ignore
     }
     
     # Get report detail from child table
+    data_items = report.get("data_items") or []
     report_detail = [
-        {"tagKey": item.tag_key, "tagId": item.tag_id, "value": item.value}
-        for item in report.get("data_items", [])
+        {"tagKey": item.tag_key, "tagId": item.tag_id, "value": item.value}  # type: ignore
+        for item in data_items
     ]
     
     # Sign
