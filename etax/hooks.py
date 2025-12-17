@@ -36,6 +36,11 @@ after_install = "etax.setup.install.after_install"
 before_uninstall = "etax.setup.install.before_uninstall"
 after_migrate = ["etax.setup.install.after_migrate"]
 
+# Error Reporting / Telemetry
+# ---------------------------
+# Reports unhandled exceptions to GitHub Issues (if enabled in settings)
+exception_handler = "etax.etax.telemetry.on_error"
+
 # Includes in <head>
 # ------------------
 

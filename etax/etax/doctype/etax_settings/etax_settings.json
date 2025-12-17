@@ -79,6 +79,10 @@
 		"timeout",
 		"retry_attempts",
 		"column_break_perf",
+		"section_telemetry",
+		"enable_error_reporting",
+		"column_break_telemetry",
+		"github_token",
 		"token_section",
 		"access_token",
 		"token_expiry",
@@ -575,6 +579,31 @@
 		{
 			"fieldname": "column_break_perf",
 			"fieldtype": "Column Break"
+		},
+		{
+			"collapsible": 1,
+			"fieldname": "section_telemetry",
+			"fieldtype": "Section Break",
+			"label": "Error Reporting (Telemetry)",
+			"description": "Help improve eTax by sending anonymous error reports to GitHub Issues"
+		},
+		{
+			"default": "0",
+			"fieldname": "enable_error_reporting",
+			"fieldtype": "Check",
+			"label": "Enable Error Reporting",
+			"description": "Send anonymous error reports to mn-frappe/etax GitHub repository"
+		},
+		{
+			"fieldname": "column_break_telemetry",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "github_token",
+			"fieldtype": "Password",
+			"label": "GitHub Token (Optional)",
+			"description": "Personal access token with 'repo' scope for issue creation",
+			"depends_on": "enable_error_reporting"
 		},
 		{
 			"collapsible": 1,
