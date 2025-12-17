@@ -1,0 +1,16 @@
+{
+    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.diagnosticSeverityOverrides": {
+        "reportLineTooLong": "none"
+    },
+    "python.linting.enabled": false,
+    "python.linting.pycodestyleEnabled": false,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Enabled": false,
+    "[python]": {
+        "editor.rulers": [120],
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "ruff.lineLength": 120
+}
