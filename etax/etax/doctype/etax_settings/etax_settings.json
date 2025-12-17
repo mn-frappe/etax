@@ -96,7 +96,8 @@
 			"collapsed": 1,
 			"fieldname": "environment_section",
 			"fieldtype": "Section Break",
-			"label": "Environment"
+			"label": "Environment",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "Staging",
@@ -124,7 +125,8 @@
 			"collapsed": 1,
 			"fieldname": "auth_section",
 			"fieldtype": "Section Break",
-			"label": "Authentication (ITC OAuth2)"
+			"label": "Authentication (ITC OAuth2)",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "https://api.frappe.mn/auth/itc-staging",
@@ -169,7 +171,8 @@
 			"collapsed": 1,
 			"fieldname": "api_section",
 			"fieldtype": "Section Break",
-			"label": "API Connection"
+			"label": "API Connection",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "https://st-etax.mta.mn/api/beta",
@@ -199,7 +202,8 @@
 			"collapsed": 1,
 			"fieldname": "organization_section",
 			"fieldtype": "Section Break",
-			"label": "Organization Info (from API)"
+			"label": "Organization Info (from API)",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"description": "Organization name (auto-filled from API)",
@@ -241,7 +245,7 @@
 		},
 		{
 			"collapsible": 1,
-			"collapsible_depends_on": "eval:!doc.autopilot_enabled",
+			"collapsible_depends_on": "eval:0",
 			"fieldname": "autopilot_section",
 			"fieldtype": "Section Break",
 			"label": "Autopilot"
@@ -287,7 +291,8 @@
 			"collapsed": 1,
 			"fieldname": "sync_section",
 			"fieldtype": "Section Break",
-			"label": "Report Sync"
+			"label": "Report Sync",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "0",
@@ -326,7 +331,8 @@
 			"collapsed": 1,
 			"fieldname": "auto_actions_section",
 			"fieldtype": "Section Break",
-			"label": "Auto Actions"
+			"label": "Auto Actions",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "1",
@@ -356,7 +362,7 @@
 		},
 		{
 			"collapsible": 1,
-			"collapsible_depends_on": "eval:!doc.enable_erpnext_vat_sync",
+			"collapsible_depends_on": "eval:0",
 			"fieldname": "section_erpnext_integration",
 			"fieldtype": "Section Break",
 			"label": "ERPNext Integration",
@@ -400,7 +406,7 @@
 		},
 		{
 			"collapsible": 1,
-			"collapsible_depends_on": "eval:!doc.enable_healthcare_vat",
+			"collapsible_depends_on": "eval:0",
 			"fieldname": "section_healthcare_integration",
 			"fieldtype": "Section Break",
 			"label": "Healthcare Integration",
@@ -436,7 +442,7 @@
 		},
 		{
 			"collapsible": 1,
-			"collapsible_depends_on": "eval:!doc.enable_education_vat",
+			"collapsible_depends_on": "eval:0",
 			"fieldname": "section_education_integration",
 			"fieldtype": "Section Break",
 			"label": "Education Integration",
@@ -472,7 +478,7 @@
 		},
 		{
 			"collapsible": 1,
-			"collapsible_depends_on": "eval:!doc.enable_lending_vat",
+			"collapsible_depends_on": "eval:0",
 			"fieldname": "section_lending_integration",
 			"fieldtype": "Section Break",
 			"label": "Lending Integration",
@@ -516,7 +522,8 @@
 			"collapsed": 1,
 			"fieldname": "debug_section",
 			"fieldtype": "Section Break",
-			"label": "Debug & Logging"
+			"label": "Debug & Logging",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "0",
@@ -548,7 +555,8 @@
 			"collapsed": 1,
 			"fieldname": "performance_section",
 			"fieldtype": "Section Break",
-			"label": "Performance"
+			"label": "Performance",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"default": "30",
@@ -573,7 +581,8 @@
 			"collapsed": 1,
 			"fieldname": "token_section",
 			"fieldtype": "Section Break",
-			"label": "Token Status"
+			"label": "Token Status",
+			"collapsible_depends_on": "eval:0"
 		},
 		{
 			"description": "Current OAuth2 access token (auto-managed)",

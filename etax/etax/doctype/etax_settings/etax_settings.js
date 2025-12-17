@@ -9,7 +9,12 @@ frappe.ui.form.on('eTax Settings', {
 		// Show/hide fields based on environment
 		frm.trigger('environment');
 		
-		// Add custom CSS for tabs
+		// Add Test Connection button next to Save (inner button)
+		frm.page.add_inner_button(__('Test Connection'), function() {
+			frm.trigger('test_connection_button');
+		});
+		
+		// Add Sync Reports button
 		frm.page.add_inner_button(__('Sync Reports'), function() {
 			frm.trigger('sync_reports');
 		});
