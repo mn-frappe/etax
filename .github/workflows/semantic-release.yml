@@ -1,0 +1,128 @@
+name: Semantic Release
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  release:
+    name: Semantic Release
+    runs-on: ubuntu-latest
+    if: github.repository == 'mn-frappe/etax'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install semantic-release
+        run: |
+          npm install -g semantic-release @semantic-release/changelog @semantic-release/git @semantic-release/exec
+
+      - name: Create semantic-release config
+        run: |
+          cat > .releaserc.json << 'EOF'
+          {
+            "branches": ["master", "main"],
+            "plugins": [
+              ["@semantic-release/commit-analyzer", {
+                "preset": "conventionalcommits",
+                "releaseRules": [
+                  {"type": "feat", "release": "minor"},
+                  {"type": "fix", "release": "patch"},
+                  {"type": "perf", "release": "patch"},
+                  {"type": "refactor", "release": "patch"},
+                  {"type": "docs", "release": false},
+                  {"type": "style", "release": false},
+                  {"type": "chore", "release": false},
+                  {"type": "test", "release": false},
+                  {"type": "ci", "release": false},
+                  {"breaking": true, "release": "major"}
+                ]
+              }],
+              ["@semantic-release/release-notes-generator", {
+                "preset": "conventionalcommits",
+                "presetConfig": {
+                  "types": [
+                    {"type": "feat", "section": "🚀 Features"},
+                    {"type": "fix", "section": "🐛 Bug Fixes"},
+                    {"type": "perf", "section": "⚡ Performance"},
+                    {"type": "refactor", "section": "♻️ Refactoring"},
+                    {"type": "docs", "section": "📚 Documentation", "hidden": true},
+                    {"type": "chore", "section": "🔧 Maintenance", "hidden": true}
+                  ]
+                }
+              }],
+              ["@semantic-release/changelog", {
+                "changelogFile": "CHANGELOG.md"
+              }],
+              ["@semantic-release/exec", {
+                "prepareCmd": "python .github/scripts/bump_version.py ${nextRelease.version}"
+              }],
+              ["@semantic-release/git", {
+                "assets": ["CHANGELOG.md", "pyproject.toml"],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+              }],
+              "@semantic-release/github"
+            ]
+          }
+          EOF
+
+      - name: Create version bump script
+        run: |
+          mkdir -p .github/scripts
+          cat > .github/scripts/bump_version.py << 'EOF'
+          #!/usr/bin/env python3
+          """Bump version in pyproject.toml for semantic-release."""
+          import re
+          import sys
+
+          def bump_version(new_version: str) -> None:
+              """Update version in pyproject.toml."""
+              with open("pyproject.toml", "r") as f:
+                  content = f.read()
+
+              # Update version in [project] section
+              content = re.sub(
+                  r'^version\s*=\s*"[^"]*"',
+                  f'version = "{new_version}"',
+                  content,
+                  flags=re.MULTILINE
+              )
+
+              with open("pyproject.toml", "w") as f:
+                  f.write(content)
+
+              print(f"✅ Updated version to {new_version}")
+
+          if __name__ == "__main__":
+              if len(sys.argv) != 2:
+                  print("Usage: bump_version.py <new_version>")
+                  sys.exit(1)
+              bump_version(sys.argv[1])
+          EOF
+          chmod +x .github/scripts/bump_version.py
+
+      - name: Run Semantic Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
