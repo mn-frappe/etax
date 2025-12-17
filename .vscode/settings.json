@@ -1,16 +1,27 @@
 {
-    "python.analysis.typeCheckingMode": "off",
+    "python.analysis.typeCheckingMode": "basic",
     "python.analysis.diagnosticSeverityOverrides": {
-        "reportLineTooLong": "none"
+        "reportLineTooLong": "none",
+        "reportMissingImports": "none",
+        "reportMissingTypeStubs": "none"
     },
-    "python.linting.enabled": false,
-    "python.linting.pycodestyleEnabled": false,
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": false,
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.inlayHints.functionReturnTypes": true,
+    "python.analysis.inlayHints.variableTypes": true,
     "[python]": {
-        "editor.rulers": [120],
+        "editor.rulers": [110],
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "charliermarsh.ruff"
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.codeActionsOnSave": {
+            "source.fixAll.ruff": "explicit",
+            "source.organizeImports.ruff": "explicit"
+        }
     },
-    "ruff.lineLength": 120
+    "ruff.lineLength": 110,
+    "mypy.runUsingActiveInterpreter": true,
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/*.pyc": true,
+        "**/node_modules": true
+    }
 }

@@ -70,3 +70,17 @@ typing-modules = ["frappe.types.DF"]
 quote-style = "double"
 indent-style = "tab"
 docstring-code-format = true
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+strict_optional = false
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+disable_error_code = ["import-untyped", "attr-defined"]
+exclude = [
+    "build/",
+    "dist/",
+    "__pycache__/",
+]
