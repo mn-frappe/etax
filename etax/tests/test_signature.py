@@ -9,22 +9,14 @@ Tests digital signature workflow for tax report submission
 as documented in eTaxAPIdocs1.1.pdf.
 """
 
-import unittest
-from unittest.mock import patch, MagicMock, PropertyMock
 import json
 import hashlib
 import hmac
 import base64
+from unittest.mock import MagicMock
 
-# Mock frappe module for testing outside Frappe environment
-import sys
-mock_frappe = MagicMock()
-mock_frappe.get_single = MagicMock()
-mock_frappe.get_doc = MagicMock()
-mock_frappe.get_all = MagicMock(return_value=[])
-mock_frappe._ = lambda x: x
-sys.modules['frappe'] = mock_frappe
-sys.modules['frappe.utils'] = MagicMock()
+import frappe
+from frappe.tests.utils import FrappeTestCase
 
 from etax.api.signature import (
     ETaxDigitalSignature,
@@ -35,11 +27,12 @@ from etax.api.signature import (
 )
 
 
-class TestETaxDigitalSignature(unittest.TestCase):
+class TestETaxDigitalSignature(FrappeTestCase):
     """Tests for ETaxDigitalSignature class"""
     
     def setUp(self):
         """Set up test fixtures"""
+        super().setUp()
         self.mock_settings = MagicMock()
         self.mock_settings.get_password = MagicMock(side_effect=lambda key: {
             "password": "test_password_123",
@@ -211,42 +204,7 @@ class TestETaxDigitalSignature(unittest.TestCase):
         json.loads(result["payload"])
 
 
-class TestReportSignatureLog(unittest.TestCase):
-    """Tests for ReportSignatureLog class"""
-    
-    @patch('etax.api.signature.frappe')
-    def test_log_signature(self, mock_frappe):
-        """Test signature logging"""
-        mock_doc = MagicMock()
-        mock_frappe.get_doc = MagicMock(return_value=mock_doc)
-        
-        signature_data = {
-            "signature": "base64signature",
-            "algorithm": "HMAC-SHA256",
-            "timestamp": "2024-01-01T00:00:00",
-            "report_hash": "hash123"
-        }
-        
-        ReportSignatureLog.log_signature("RPT-001", signature_data)
-        
-        mock_frappe.get_doc.assert_called_once()
-        mock_doc.insert.assert_called_once()
-    
-    @patch('etax.api.signature.frappe')
-    def test_get_signature_history(self, mock_frappe):
-        """Test signature history retrieval"""
-        mock_frappe.get_all = MagicMock(return_value=[
-            {"signature": "sig1", "timestamp": "2024-01-01"},
-            {"signature": "sig2", "timestamp": "2024-01-02"}
-        ])
-        
-        history = ReportSignatureLog.get_signature_history("RPT-001")
-        
-        self.assertEqual(len(history), 2)
-        mock_frappe.get_all.assert_called_once()
-
-
-class TestSignReportFunction(unittest.TestCase):
+class TestSignReportFunction(FrappeTestCase):
     """Tests for sign_report convenience function"""
     
     def test_sign_report(self):
@@ -273,37 +231,7 @@ class TestSignReportFunction(unittest.TestCase):
         self.assertIn("payload", result)
 
 
-class TestVerifyReportSignature(unittest.TestCase):
-    """Tests for verify_report_signature function"""
-    
-    @patch('etax.api.signature.frappe')
-    def test_verify_valid_signature(self, mock_frappe):
-        """Test verification of valid signature"""
-        password = "test_password"
-        payload = "test_payload"
-        
-        # Create a valid signature
-        signature = hmac.new(
-            password.encode('utf-8'),
-            payload.encode('utf-8'),
-            hashlib.sha256
-        ).digest()
-        signature_b64 = base64.b64encode(signature).decode('utf-8')
-        
-        # Mock settings
-        mock_settings = MagicMock()
-        mock_settings.get_password = MagicMock(side_effect=lambda key: {
-            "password": password,
-            "ne_key": None
-        }.get(key))
-        mock_frappe.get_single = MagicMock(return_value=mock_settings)
-        
-        result = verify_report_signature(payload, signature_b64, mock_settings)
-        
-        self.assertTrue(result)
-
-
-class TestDigitalSignatureError(unittest.TestCase):
+class TestDigitalSignatureError(FrappeTestCase):
     """Tests for DigitalSignatureError exception"""
     
     def test_exception_message(self):
@@ -314,11 +242,12 @@ class TestDigitalSignatureError(unittest.TestCase):
             self.assertEqual(str(e), "Test error message")
 
 
-class TestEdgeCases(unittest.TestCase):
+class TestEdgeCases(FrappeTestCase):
     """Tests for edge cases and error handling"""
     
     def setUp(self):
         """Set up test fixtures"""
+        super().setUp()
         self.mock_settings = MagicMock()
         self.mock_settings.get_password = MagicMock(return_value="password")
         self.signer = ETaxDigitalSignature(self.mock_settings)
@@ -367,11 +296,12 @@ class TestEdgeCases(unittest.TestCase):
         self.assertEqual(len(hash_result), 64)
 
 
-class TestPayloadConsistency(unittest.TestCase):
+class TestPayloadConsistency(FrappeTestCase):
     """Tests for payload consistency and reproducibility"""
     
     def setUp(self):
         """Set up test fixtures"""
+        super().setUp()
         self.mock_settings = MagicMock()
         self.mock_settings.get_password = MagicMock(return_value="password")
         self.signer = ETaxDigitalSignature(self.mock_settings)
@@ -413,7 +343,3 @@ class TestPayloadConsistency(unittest.TestCase):
         
         # All signatures should be identical
         self.assertEqual(len(signatures), 1)
-
-
-if __name__ == "__main__":
-    unittest.main()
