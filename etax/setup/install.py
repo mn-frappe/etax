@@ -20,6 +20,7 @@ def after_install():
 	"""Run after eTax app is installed"""
 	create_default_settings()
 	setup_permissions()
+	add_to_integrations_workspace()
 	frappe.db.commit()
 	print("eTax app installed successfully!")
 
