@@ -1,14 +1,34 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2024, Digital Consulting Service LLC (Mongolia)
+# License: GNU General Public License v3
+
+"""
+eTax - Electronic Tax Reporting for Mongolia Tax Authority (MTA)
+
+Works with ERPNext and all ERPNext-based apps:
+- ERPNext Core: Sales Invoice, Purchase Invoice, GL Entry for VAT reporting
+- Healthcare: Patient billing feeds into tax reports
+- Education: Student fees feeds into tax reports
+- Lending: Loan transactions for tax reporting
+
+eTax aggregates data from ERPNext's accounting module for:
+- VAT Returns (НӨАТ тайлан)
+- Corporate Tax Returns (ААНОАТ)
+- Income Tax Reports
+"""
+
 app_name = "etax"
 app_title = "eTax"
 app_publisher = "Digital Consulting Service LLC (Mongolia)"
-app_description = "Electronic Tax Reporting for ERPNext - Mongolia Tax Authority (MTA) Integration"
+app_description = (
+    "Electronic Tax Reporting for Mongolia Tax Authority (MTA). "
+    "Works with ERPNext and all accounting transactions from Healthcare, Education, Lending."
+)
 app_email = "dev@frappe.mn"
 app_license = "gpl-3.0"
 app_version = "1.1.0"
 
-# Apps
-# ------------------
-
+# Required Apps - ERPNext required for accounting data
 required_apps = ["frappe", "erpnext"]
 
 # Installation hooks
