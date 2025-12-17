@@ -1,0 +1,19 @@
+# CODEOWNERS - Auto-assign reviewers for PRs
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything
+* @mn-frappe/maintainers
+
+# Python code
+*.py @mn-frappe/maintainers
+
+# Configuration
+pyproject.toml @mn-frappe/maintainers
+*.json @mn-frappe/maintainers
+
+# CI/CD
+.github/ @mn-frappe/maintainers
+
+# Documentation
+*.md @mn-frappe/maintainers
+docs/ @mn-frappe/maintainers
