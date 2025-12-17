@@ -46,7 +46,8 @@ def is_telemetry_enabled() -> bool:
 def get_github_token() -> str | None:
     """Get GitHub token for issue creation."""
     try:
-        return frappe.db.get_single_value("eTax Settings", "github_token")
+        token = frappe.db.get_single_value("eTax Settings", "github_token")
+        return str(token) if token else None
     except Exception:
         return None
 
