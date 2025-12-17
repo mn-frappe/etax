@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2024, Digital Consulting Service LLC (Mongolia)
 # License: GNU General Public License v3
+# pyright: reportMissingImports=false, reportAttributeAccessIssue=false, reportArgumentType=false
 
 """
 eTax Performance Utilities
@@ -15,6 +16,13 @@ from frappe.utils import flt, getdate, add_months, get_first_day, get_last_day
 from typing import Optional, List, Dict, Any
 import time
 import functools
+
+# Import logger utilities
+from etax.logger import (
+    log_info, log_debug, log_warning, log_error,
+    log_api_call, log_tax_report, log_scheduler_task,
+    log_tin_lookup, log_cache_operation
+)
 
 
 # =============================================================================
@@ -131,8 +139,10 @@ def get_taxpayer_info_cached(tin: str, validate: bool = False) -> Optional[Dict]
     )
     
     if local:
-        set_cached(key, local, ttl=86400)  # Cache for 24 hours
-        return local
+        if isinstance(local, dict):
+            set_cached(key, local, ttl=86400)  # Cache for 24 hours
+            return local
+        return None
     
     # Validate with API if requested
     if validate:
@@ -258,7 +268,7 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
     month_end = get_last_day(month_start)
     
     # Get all sales invoices for the period
-    invoices = frappe.db.sql("""
+    inv_result = list(frappe.db.sql("""
         SELECT 
             COUNT(*) as count,
             COALESCE(SUM(base_net_total), 0) as net_total,
@@ -268,10 +278,11 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
         WHERE company = %s
         AND posting_date BETWEEN %s AND %s
         AND docstatus = 1
-    """, (company, month_start, month_end), as_dict=True)[0]
+    """, (company, month_start, month_end), as_dict=True))
+    invoices = inv_result[0] if inv_result else {"count": 0, "net_total": 0, "vat_amount": 0, "grand_total": 0}
     
     # Get by customer type (domestic vs export)
-    domestic = frappe.db.sql("""
+    dom_result = list(frappe.db.sql("""
         SELECT 
             COUNT(*) as count,
             COALESCE(SUM(base_net_total), 0) as net_total,
@@ -283,28 +294,38 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
         AND docstatus = 1
         AND COALESCE(is_internal_customer, 0) = 0
         AND COALESCE(territory, '') NOT IN ('Foreign', 'Export', 'International')
-    """, (company, month_start, month_end), as_dict=True)[0]
+    """, (company, month_start, month_end), as_dict=True))
+    domestic = dom_result[0] if dom_result else {"count": 0, "net_total": 0, "vat_amount": 0, "grand_total": 0}
+    
+    inv_count = int(invoices.get("count", 0) or 0)
+    dom_count = int(domestic.get("count", 0) or 0)
+    inv_net = flt(invoices.get("net_total", 0))
+    dom_net = flt(domestic.get("net_total", 0))
+    inv_vat = flt(invoices.get("vat_amount", 0))
+    dom_vat = flt(domestic.get("vat_amount", 0))
+    inv_grand = flt(invoices.get("grand_total", 0))
+    dom_grand = flt(domestic.get("grand_total", 0))
     
     return {
         "company": company,
         "period": period,
         "total": {
-            "count": invoices.count,
-            "net_total": flt(invoices.net_total),
-            "vat_amount": flt(invoices.vat_amount),
-            "grand_total": flt(invoices.grand_total)
+            "count": inv_count,
+            "net_total": inv_net,
+            "vat_amount": inv_vat,
+            "grand_total": inv_grand
         },
         "domestic": {
-            "count": domestic.count,
-            "net_total": flt(domestic.net_total),
-            "vat_amount": flt(domestic.vat_amount),
-            "grand_total": flt(domestic.grand_total)
+            "count": dom_count,
+            "net_total": dom_net,
+            "vat_amount": dom_vat,
+            "grand_total": dom_grand
         },
         "export": {
-            "count": invoices.count - domestic.count,
-            "net_total": flt(invoices.net_total) - flt(domestic.net_total),
-            "vat_amount": flt(invoices.vat_amount) - flt(domestic.vat_amount),
-            "grand_total": flt(invoices.grand_total) - flt(domestic.grand_total)
+            "count": inv_count - dom_count,
+            "net_total": inv_net - dom_net,
+            "vat_amount": inv_vat - dom_vat,
+            "grand_total": inv_grand - dom_grand
         }
     }
 
@@ -338,7 +359,7 @@ def calculate_vat_purchase_summary(company: str, period: str) -> Dict:
     month_start = get_first_day(f"{year}-{month:02d}-01")
     month_end = get_last_day(month_start)
     
-    invoices = frappe.db.sql("""
+    inv_result = list(frappe.db.sql("""
         SELECT 
             COUNT(*) as count,
             COALESCE(SUM(base_net_total), 0) as net_total,
@@ -348,16 +369,17 @@ def calculate_vat_purchase_summary(company: str, period: str) -> Dict:
         WHERE company = %s
         AND posting_date BETWEEN %s AND %s
         AND docstatus = 1
-    """, (company, month_start, month_end), as_dict=True)[0]
+    """, (company, month_start, month_end), as_dict=True))
+    invoices = inv_result[0] if inv_result else {"count": 0, "net_total": 0, "vat_amount": 0, "grand_total": 0}
     
     return {
         "company": company,
         "period": period,
         "total": {
-            "count": invoices.count,
-            "net_total": flt(invoices.net_total),
-            "vat_amount": flt(invoices.vat_amount),
-            "grand_total": flt(invoices.grand_total)
+            "count": int(invoices.get("count", 0) or 0),
+            "net_total": flt(invoices.get("net_total", 0)),
+            "vat_amount": flt(invoices.get("vat_amount", 0)),
+            "grand_total": flt(invoices.get("grand_total", 0))
         }
     }
 
@@ -393,6 +415,7 @@ def auto_sync_tax_reports():
         frappe.log_error(f"Auto-sync tax reports failed: {e}")
 
 
+@log_scheduler_task("Auto Submit VAT Reports")
 def auto_submit_vat_reports():
     """
     Automatically submit VAT reports when due.
@@ -400,7 +423,8 @@ def auto_submit_vat_reports():
     """
     settings = frappe.get_single("eTax Settings")
     if not getattr(settings, "auto_fetch_reports", False):
-        return
+        log_debug("Auto submit disabled - skipping")
+        return {"status": "skipped", "reason": "auto_submit_disabled"}
     
     # Find reports due for submission
     due_reports = frappe.get_all(
@@ -413,13 +437,24 @@ def auto_submit_vat_reports():
         limit=10
     )
     
+    submitted_count = 0
+    error_count = 0
+    
     for report in due_reports:
-        frappe.enqueue(
-            "etax.api.client.submit_report",
-            report_name=report.name,
-            queue="long",
-            timeout=600
-        )
+        try:
+            frappe.enqueue(
+                "etax.api.client.submit_report",
+                report_name=report.name,
+                queue="long",
+                timeout=600
+            )
+            log_info(f"Queued VAT report submission", {"report": report.name, "company": report.company, "period": report.period_name})
+            submitted_count += 1
+        except Exception as e:
+            log_error(f"Failed to queue report submission {report.name}", exc=e)
+            error_count += 1
+    
+    return {"submitted": submitted_count, "errors": error_count, "total_found": len(due_reports)}
 
 
 # =============================================================================
@@ -434,6 +469,9 @@ def on_invoice_update(doc, method=None):
         return
     
     posting_date = getdate(doc.posting_date)
+    if not posting_date:
+        return
+        
     period = f"{posting_date.year}-{posting_date.month:02d}"
     
     # Determine invoice type
