@@ -3,6 +3,9 @@
 
 frappe.ui.form.on('eTax Settings', {
 	refresh: function(frm) {
+		// Toggle integration sections based on installed apps
+		toggle_integration_sections(frm);
+		
 		// Show/hide fields based on environment
 		frm.trigger('environment');
 		
@@ -125,3 +128,48 @@ frappe.ui.form.on('eTax Settings', {
 		});
 	}
 });
+
+
+/**
+ * Show/hide integration sections based on installed apps
+ */
+function toggle_integration_sections(frm) {
+// Check for installed apps via boot flags
+const apps = {
+healthcare: frappe.boot.has_healthcare || false,
+education: frappe.boot.has_education || false,
+lending: frappe.boot.has_lending || false
+};
+
+// Healthcare section fields
+const healthcare_fields = [
+'section_healthcare_integration',
+'enable_healthcare_vat',
+'healthcare_vat_exempt',
+'column_break_healthcare_int',
+'healthcare_services_account'
+];
+
+// Education section fields
+const education_fields = [
+'section_education_integration',
+'enable_education_vat',
+'education_vat_exempt',
+'column_break_education_int',
+'education_fees_account'
+];
+
+// Lending section fields
+const lending_fields = [
+'section_lending_integration',
+'enable_lending_vat',
+'lending_interest_vat_exempt',
+'column_break_lending_int',
+'lending_fees_account'
+];
+
+// Toggle visibility
+healthcare_fields.forEach(f => frm.toggle_display(f, apps.healthcare));
+education_fields.forEach(f => frm.toggle_display(f, apps.education));
+lending_fields.forEach(f => frm.toggle_display(f, apps.lending));
+}

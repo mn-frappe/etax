@@ -184,9 +184,16 @@ doc_events = {
 # }
 
 scheduler_events = {
+	"hourly": [
+		"etax.performance.auto_sync_tax_reports",
+	],
 	"daily": [
-		"etax.tasks.daily.sync_reports_daily"
-	]
+		"etax.tasks.daily.sync_reports_daily",
+		"etax.performance.auto_submit_vat_reports",
+	],
+	"weekly": [
+		"etax.performance.ensure_indexes",
+	],
 }
 
 # Testing

@@ -31,6 +31,12 @@
 		"taxpayer_type",
 		"ent_id",
 		"automation_tab",
+		"autopilot_section",
+		"autopilot_enabled",
+		"auto_fill_vat_returns",
+		"column_break_autopilot",
+		"auto_submit_on_deadline",
+		"deadline_days_before",
 		"sync_section",
 		"auto_sync_reports",
 		"sync_frequency",
@@ -42,6 +48,27 @@
 		"column_break_auto",
 		"notify_on_deadline",
 		"notify_email",
+		"section_erpnext_integration",
+		"enable_erpnext_vat_sync",
+		"auto_calculate_vat",
+		"column_break_erpnext_int",
+		"vat_output_account",
+		"vat_input_account",
+		"section_healthcare_integration",
+		"enable_healthcare_vat",
+		"healthcare_vat_exempt",
+		"column_break_healthcare_int",
+		"healthcare_services_account",
+		"section_education_integration",
+		"enable_education_vat",
+		"education_vat_exempt",
+		"column_break_education_int",
+		"education_fees_account",
+		"section_lending_integration",
+		"enable_lending_vat",
+		"lending_interest_vat_exempt",
+		"column_break_lending_int",
+		"lending_fees_account",
 		"advanced_tab",
 		"debug_section",
 		"debug_mode",
@@ -214,6 +241,49 @@
 		},
 		{
 			"collapsible": 1,
+			"collapsible_depends_on": "eval:!doc.autopilot_enabled",
+			"fieldname": "autopilot_section",
+			"fieldtype": "Section Break",
+			"label": "Autopilot"
+		},
+		{
+			"default": "0",
+			"description": "Enable fully automated VAT reporting. VAT returns will be filled and submitted automatically.",
+			"fieldname": "autopilot_enabled",
+			"fieldtype": "Check",
+			"label": "Enable Autopilot",
+			"bold": 1
+		},
+		{
+			"default": "1",
+			"depends_on": "autopilot_enabled",
+			"description": "Automatically fill VAT return data from Sales/Purchase invoices.",
+			"fieldname": "auto_fill_vat_returns",
+			"fieldtype": "Check",
+			"label": "Auto-fill VAT Returns"
+		},
+		{
+			"fieldname": "column_break_autopilot",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "0",
+			"depends_on": "autopilot_enabled",
+			"description": "Automatically submit VAT returns before deadline.",
+			"fieldname": "auto_submit_on_deadline",
+			"fieldtype": "Check",
+			"label": "Auto-submit Before Deadline"
+		},
+		{
+			"default": "3",
+			"depends_on": "auto_submit_on_deadline",
+			"description": "Days before deadline to auto-submit.",
+			"fieldname": "deadline_days_before",
+			"fieldtype": "Int",
+			"label": "Days Before Deadline"
+		},
+		{
+			"collapsible": 1,
 			"collapsed": 1,
 			"fieldname": "sync_section",
 			"fieldtype": "Section Break",
@@ -283,6 +353,158 @@
 			"fieldtype": "Data",
 			"label": "Notification Email",
 			"options": "Email"
+		},
+		{
+			"collapsible": 1,
+			"collapsible_depends_on": "eval:!doc.enable_erpnext_vat_sync",
+			"fieldname": "section_erpnext_integration",
+			"fieldtype": "Section Break",
+			"label": "ERPNext Integration",
+			"description": "VAT data integration with ERPNext invoices"
+		},
+		{
+			"default": "1",
+			"description": "Enable automatic VAT calculation from ERPNext invoices.",
+			"fieldname": "enable_erpnext_vat_sync",
+			"fieldtype": "Check",
+			"label": "Enable ERPNext VAT Sync",
+			"bold": 1
+		},
+		{
+			"default": "1",
+			"depends_on": "enable_erpnext_vat_sync",
+			"description": "Automatically calculate VAT totals from submitted invoices.",
+			"fieldname": "auto_calculate_vat",
+			"fieldtype": "Check",
+			"label": "Auto-calculate VAT"
+		},
+		{
+			"fieldname": "column_break_erpnext_int",
+			"fieldtype": "Column Break"
+		},
+		{
+			"depends_on": "enable_erpnext_vat_sync",
+			"description": "VAT Output (Sales) account for tracking.",
+			"fieldname": "vat_output_account",
+			"fieldtype": "Link",
+			"label": "VAT Output Account",
+			"options": "Account"
+		},
+		{
+			"depends_on": "enable_erpnext_vat_sync",
+			"description": "VAT Input (Purchase) account for tracking.",
+			"fieldname": "vat_input_account",
+			"fieldtype": "Link",
+			"label": "VAT Input Account",
+			"options": "Account"
+		},
+		{
+			"collapsible": 1,
+			"collapsible_depends_on": "eval:!doc.enable_healthcare_vat",
+			"fieldname": "section_healthcare_integration",
+			"fieldtype": "Section Break",
+			"label": "Healthcare Integration",
+			"description": "VAT handling for healthcare services"
+		},
+		{
+			"default": "0",
+			"description": "Enable healthcare-specific VAT handling.",
+			"fieldname": "enable_healthcare_vat",
+			"fieldtype": "Check",
+			"label": "Enable Healthcare VAT",
+			"bold": 1
+		},
+		{
+			"default": "1",
+			"depends_on": "enable_healthcare_vat",
+			"description": "Mark healthcare services as VAT exempt.",
+			"fieldname": "healthcare_vat_exempt",
+			"fieldtype": "Check",
+			"label": "Healthcare VAT Exempt"
+		},
+		{
+			"fieldname": "column_break_healthcare_int",
+			"fieldtype": "Column Break"
+		},
+		{
+			"depends_on": "enable_healthcare_vat",
+			"description": "Account for healthcare services revenue.",
+			"fieldname": "healthcare_services_account",
+			"fieldtype": "Link",
+			"label": "Healthcare Services Account",
+			"options": "Account"
+		},
+		{
+			"collapsible": 1,
+			"collapsible_depends_on": "eval:!doc.enable_education_vat",
+			"fieldname": "section_education_integration",
+			"fieldtype": "Section Break",
+			"label": "Education Integration",
+			"description": "VAT handling for education services"
+		},
+		{
+			"default": "0",
+			"description": "Enable education-specific VAT handling.",
+			"fieldname": "enable_education_vat",
+			"fieldtype": "Check",
+			"label": "Enable Education VAT",
+			"bold": 1
+		},
+		{
+			"default": "1",
+			"depends_on": "enable_education_vat",
+			"description": "Mark education fees as VAT exempt.",
+			"fieldname": "education_vat_exempt",
+			"fieldtype": "Check",
+			"label": "Education VAT Exempt"
+		},
+		{
+			"fieldname": "column_break_education_int",
+			"fieldtype": "Column Break"
+		},
+		{
+			"depends_on": "enable_education_vat",
+			"description": "Account for education fee revenue.",
+			"fieldname": "education_fees_account",
+			"fieldtype": "Link",
+			"label": "Education Fees Account",
+			"options": "Account"
+		},
+		{
+			"collapsible": 1,
+			"collapsible_depends_on": "eval:!doc.enable_lending_vat",
+			"fieldname": "section_lending_integration",
+			"fieldtype": "Section Break",
+			"label": "Lending Integration",
+			"description": "VAT handling for lending services"
+		},
+		{
+			"default": "0",
+			"description": "Enable lending-specific VAT handling.",
+			"fieldname": "enable_lending_vat",
+			"fieldtype": "Check",
+			"label": "Enable Lending VAT",
+			"bold": 1
+		},
+		{
+			"default": "1",
+			"depends_on": "enable_lending_vat",
+			"description": "Mark loan interest as VAT exempt.",
+			"fieldname": "lending_interest_vat_exempt",
+			"fieldtype": "Check",
+			"label": "Interest VAT Exempt"
+		},
+		{
+			"fieldname": "column_break_lending_int",
+			"fieldtype": "Column Break"
+		},
+		{
+			"depends_on": "enable_lending_vat",
+			"description": "Account for lending fees/commissions.",
+			"fieldname": "lending_fees_account",
+			"fieldtype": "Link",
+			"label": "Lending Fees Account",
+			"options": "Account"
 		},
 		{
 			"fieldname": "advanced_tab",
