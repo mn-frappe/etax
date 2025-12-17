@@ -70,21 +70,25 @@ def after_migrate():
 
 
 def add_to_integrations_workspace():
-	"""Add eTax Settings to Integrations workspace under MN Settings section"""
+	"""Add eTax Settings to Integrations workspace under MN Settings section.
+	
+	Properly calculates idx to avoid conflicts with other apps.
+	"""
 	if not frappe.db.exists("Workspace", "Integrations"):
 		return
 	
 	workspace = frappe.get_doc("Workspace", "Integrations")
 	
-	# Check if MN Settings section exists
-	mn_settings_exists = False
-	etax_link_exists = False
-	mn_settings_idx = -1
+	# Get the maximum idx to avoid conflicts
+	max_idx = max([link.idx or 0 for link in workspace.links] or [0])
 	
-	for i, link in enumerate(workspace.links):
+	# Check if MN Settings section exists and eTax link exists
+	mn_settings_idx = None
+	etax_link_exists = False
+	
+	for link in workspace.links:
 		if link.type == "Card Break" and link.label == "MN Settings":
-			mn_settings_exists = True
-			mn_settings_idx = i
+			mn_settings_idx = link.idx
 		if link.link_to == "eTax Settings":
 			etax_link_exists = True
 	
@@ -95,20 +99,24 @@ def add_to_integrations_workspace():
 	modified = False
 	
 	# Add MN Settings section if it doesn't exist
-	if not mn_settings_exists:
+	if mn_settings_idx is None:
+		max_idx += 1
 		workspace.append("links", {
 			"type": "Card Break",
-			"label": "MN Settings"
+			"label": "MN Settings",
+			"idx": max_idx,
 		})
 		modified = True
 	
-	# Add eTax Settings link
+	# Add eTax Settings link with proper idx
+	max_idx = max([link.idx or 0 for link in workspace.links] or [0]) + 1
 	workspace.append("links", {
 		"type": "Link",
 		"label": "eTax Settings",
 		"link_to": "eTax Settings",
 		"link_type": "DocType",
-		"icon": "tax"
+		"icon": "tax",
+		"idx": max_idx,
 	})
 	modified = True
 	
