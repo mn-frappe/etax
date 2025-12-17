@@ -81,13 +81,34 @@ class eTaxSettings(Document):
 			from etax.api.client import ETaxClient
 			
 			client = ETaxClient(self)
-			org_info = client.get_user_orgs()
+			all_orgs = client.get_user_orgs(skip_cache=True)
 			
-			if org_info:
-				# Update organization info
-				org = org_info[0] if isinstance(org_info, list) else org_info
-				self.org_name = org.get("entityName", "")
-				self.taxpayer_tin = org.get("Tin", "")
+			if all_orgs:
+				# Find the organization matching configured org_regno
+				org = None
+				if self.org_regno:
+					for o in all_orgs:
+						# Match by pin (registry number)
+						if str(o.get("pin", "")) == str(self.org_regno):
+							org = o
+							break
+				
+				if not org:
+					# No matching org found - show available options
+					available_orgs = [f"{o.get('pin')}: {o.get('entityName')}" for o in all_orgs[:5]]
+					return {
+						"success": False,
+						"message": _("Organization with RegNo '{0}' not found. Available organizations: {1}").format(
+							self.org_regno, 
+							", ".join(available_orgs)
+						)
+					}
+				
+				# Update organization info from matched org
+				self.org_name = org.get("entityName", "").strip()
+				self.taxpayer_tin = org.get("tin", "")
+				self.ent_id = org.get("id")  # Store entity ID for API calls
+				self.connection_status = "Connected"
 				
 				ent_type = org.get("entType")
 				if ent_type == 1:
@@ -104,9 +125,18 @@ class eTaxSettings(Document):
 					"taxpayer_tin": self.taxpayer_tin
 				}
 			
-			return {"success": False, "message": _("No organization data returned")}
+			# Authentication succeeded but no organizations linked
+			self.connection_status = "Auth OK - No Orgs"
+			self.save()
+			return {
+				"success": True,
+				"message": _("Authentication successful! No taxpayer organizations linked to this account. Please register your organization (TIN) at st-etax.mta.mn first."),
+				"warning": True
+			}
 			
 		except Exception as e:
+			self.connection_status = "Failed"
+			self.save()
 			frappe.log_error(f"eTax connection test failed: {str(e)}", "eTax")
 			return {"success": False, "message": str(e)}
 	

@@ -52,9 +52,13 @@ class ETaxAuth:
 		"Production": "https://auth.itc.gov.mn/auth/realms/ITC"
 	}
 	
-	# OAuth2 client ID - vatps is the unified ITC client
-	# Note: etax-gui-test/etax-gui from docs don't exist on ITC server
-	CLIENT_ID = "vatps"
+	# OAuth2 client ID for eTax API access
+	# etax-gui is the official client that has permissions for eTax user/org data
+	# vatps only has basic profile access, not eTax data
+	CLIENT_IDS = {
+		"Staging": "etax-gui",
+		"Production": "etax-gui"
+	}
 	
 	# Fixed OAuth2 parameters
 	GRANT_TYPE = "password"
@@ -98,8 +102,8 @@ class ETaxAuth:
 	
 	@property
 	def client_id(self):
-		"""Get OAuth2 client ID (vatps - unified ITC client)"""
-		return self.CLIENT_ID
+		"""Get OAuth2 client ID for eTax API access"""
+		return self.CLIENT_IDS.get(self.environment, self.CLIENT_IDS["Staging"])
 	
 	@property
 	def token_endpoint(self):
@@ -237,13 +241,6 @@ class ETaxAuth:
 			error_msg = error_data.get("error_description", 
 				error_data.get("error", f"HTTP {response.status_code}"))
 			raise ETaxAuthError(f"Authentication failed: {error_msg}")
-			
-		except requests.exceptions.RequestException as e:
-			raise ETaxAuthError(f"Gateway connection failed: {str(e)}")
-		except ETaxAuthError:
-			raise
-		except Exception as e:
-			raise ETaxAuthError(f"Authentication error: {str(e)}")
 			
 		except requests.exceptions.RequestException as e:
 			raise ETaxAuthError(f"Gateway connection failed: {str(e)}")

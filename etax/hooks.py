@@ -4,7 +4,7 @@ app_publisher = "Digital Consulting Service LLC (Mongolia)"
 app_description = "Electronic Tax Reporting for ERPNext - Mongolia Tax Authority (MTA) Integration"
 app_email = "dev@frappe.mn"
 app_license = "gpl-3.0"
-app_version = "1.0.0"
+app_version = "1.1.0"
 
 # Apps
 # ------------------

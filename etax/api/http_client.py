@@ -6,8 +6,12 @@
 """
 eTax API - HTTP Client Module
 
-Handles all HTTP communication with eTax API.
+Handles all HTTP communication with eTax API via api.frappe.mn gateway.
 Includes NE-KEY header support required by all eTax endpoints.
+
+API Gateway (api.frappe.mn):
+- Staging: /etax-staging/ → st-etax.mta.mn/api/beta/
+- Production: /etax/ → etax.mta.mn/api/beta/
 
 Performance optimizations:
 - Connection pooling via requests.Session
@@ -37,6 +41,7 @@ class ETaxHTTPClient:
 	HTTP client for eTax API with NE-KEY support.
 	
 	Key features:
+	- Routes through api.frappe.mn gateway (Mongolian IP requirement)
 	- NE-KEY header automatically added to all requests
 	- Authorization header management
 	- Error handling and logging
@@ -48,6 +53,13 @@ class ETaxHTTPClient:
 	- 400: Invalid parameters
 	- 500: Internal server error
 	"""
+	
+	# API Gateway
+	GATEWAY_URL = "https://api.frappe.mn"
+	GATEWAY_PATHS = {
+		"Staging": "/etax-staging",
+		"Production": "/etax"
+	}
 	
 	def __init__(self, settings=None):
 		"""
@@ -74,11 +86,17 @@ class ETaxHTTPClient:
 			return None
 	
 	@property
-	def base_url(self):
-		"""Get API base URL"""
+	def environment(self):
+		"""Get current environment"""
 		if self.settings:
-			return self.settings.api_base_url or "https://st-etax.mta.mn/api/beta"
-		return "https://st-etax.mta.mn/api/beta"
+			return self.settings.environment or "Staging"
+		return "Staging"
+	
+	@property
+	def base_url(self):
+		"""Get API base URL via gateway"""
+		gateway_path = self.GATEWAY_PATHS.get(self.environment, self.GATEWAY_PATHS["Staging"])
+		return f"{self.GATEWAY_URL}{gateway_path}"
 	
 	@property
 	def timeout(self):
@@ -99,18 +117,27 @@ class ETaxHTTPClient:
 		return None
 	
 	def _build_url(self, endpoint):
-		"""Build full URL from endpoint"""
+		"""
+		Build full URL from endpoint via gateway.
+		
+		Gateway mapping:
+		- /etax-staging/user/orgs → st-etax.mta.mn/api/user/orgs
+		- /etax-staging/forms → st-etax.mta.mn/api/beta/forms
+		"""
 		if endpoint.startswith("http"):
 			return endpoint
 		
-		# Handle different endpoint formats
-		if endpoint.startswith("/"):
-			# If endpoint includes /api/beta, use it as-is with base domain
-			if "/api/" in endpoint:
-				base_domain = self.base_url.rsplit("/api", 1)[0]
-				return f"{base_domain}{endpoint}"
-			return f"{self.base_url}{endpoint}"
+		# Clean up endpoint
+		endpoint = endpoint.lstrip("/")
 		
+		# Handle /api/user/ endpoints (different path on gateway)
+		if endpoint.startswith("api/user/") or endpoint.startswith("user/"):
+			# Use /etax-staging/user/ gateway path
+			user_path = endpoint.replace("api/user/", "").replace("user/", "")
+			gateway_path = self.GATEWAY_PATHS.get(self.environment, self.GATEWAY_PATHS["Staging"])
+			return f"{self.GATEWAY_URL}{gateway_path}/user/{user_path}"
+		
+		# Standard /api/beta/ endpoints use base gateway path
 		return f"{self.base_url}/{endpoint}"
 	
 	def _get_headers(self, auth_header=None, extra_headers=None, content_type="application/json"):
@@ -192,7 +219,7 @@ eTax API Response:
 			response: requests.Response object
 			
 		Returns:
-			dict: Response data
+			dict or list: Response data
 			
 		Raises:
 			ETaxHTTPError: On error response
@@ -206,6 +233,10 @@ eTax API Response:
 					status_code=response.status_code
 				)
 			return {"raw_response": response.text}
+		
+		# If response is a list (e.g., getUserOrgs), return directly
+		if isinstance(data, list):
+			return data
 		
 		# Check for eTax API error codes
 		code = data.get("code")

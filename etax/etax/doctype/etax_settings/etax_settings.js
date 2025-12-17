@@ -58,27 +58,33 @@ frappe.ui.form.on('eTax Settings', {
 			callback: function(r) {
 				if (r.message) {
 					if (r.message.success) {
-						frm.set_value('connection_status', __('Connected'));
+						if (r.message.warning) {
+							// Authentication OK but no orgs linked
+							frappe.msgprint({
+								title: __('Authentication Successful'),
+								indicator: 'orange',
+								message: r.message.message
+							});
+						} else {
+							// Full success with org info
+							frappe.show_alert({
+								message: __('Connection successful!') + '<br>' + 
+									__('Organization: {0}', [r.message.org_name || '']),
+								indicator: 'green'
+							}, 5);
+						}
 						frm.reload_doc();
-						
-						frappe.show_alert({
-							message: __('Connection successful!') + '<br>' + 
-								__('Organization: {0}', [r.message.org_name || '']),
-							indicator: 'green'
-						}, 5);
 					} else {
-						frm.set_value('connection_status', __('Failed'));
-						
 						frappe.msgprint({
 							title: __('Connection Failed'),
 							indicator: 'red',
 							message: r.message.message || __('Unknown error')
 						});
+						frm.reload_doc();
 					}
 				}
 			},
 			error: function(r) {
-				frm.set_value('connection_status', __('Error'));
 				frappe.msgprint({
 					title: __('Connection Error'),
 					indicator: 'red',
