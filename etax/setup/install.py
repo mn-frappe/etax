@@ -73,7 +73,10 @@ def add_to_integrations_workspace():
 	"""Add eTax Settings to Integrations workspace under MN Settings section.
 	
 	Properly calculates idx to avoid conflicts with other apps.
+	Also updates the content JSON which controls the visual layout.
 	"""
+	import json
+	
 	if not frappe.db.exists("Workspace", "Integrations"):
 		return
 	
@@ -120,8 +123,27 @@ def add_to_integrations_workspace():
 	})
 	modified = True
 	
+	# Update content JSON to include MN Settings card (controls visual layout)
+	if workspace.content:
+		content = json.loads(workspace.content)
+		mn_card_in_content = any(
+			item.get("data", {}).get("card_name") == "MN Settings"
+			for item in content
+			if item.get("type") == "card"
+		)
+		if not mn_card_in_content:
+			# Add MN Settings card to content
+			content.append({
+				"id": frappe.generate_hash(length=10),
+				"type": "card",
+				"data": {"card_name": "MN Settings", "col": 4},
+			})
+			workspace.content = json.dumps(content)
+			modified = True
+	
 	if modified:
 		workspace.save()
+		frappe.db.commit()
 		print("  ✓ Added eTax Settings to Integrations workspace (MN Settings section)")
 
 
