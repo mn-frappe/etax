@@ -18,12 +18,12 @@ Cache Strategy:
 - Dynamic data (reports): Short TTL (5 min)
 """
 
-import frappe
-import json
 import hashlib
-from typing import Optional, Any, Callable
+import json
+from collections.abc import Callable
 from functools import wraps
 
+import frappe
 
 # Cache key prefixes
 CACHE_PREFIX = "etax"
@@ -53,10 +53,10 @@ def get_cache_key(*args, **kwargs) -> str:
 	return hashlib.md5(key_data.encode()).hexdigest()[:16]
 
 
-def cached(key_prefix: str, ttl: Optional[int] = None):
+def cached(key_prefix: str, ttl: int | None = None):
 	"""
 	Decorator for caching function results.
-	
+
 	Usage:
 		@cached("reports", ttl=300)
 		def get_reports(ent_id):
@@ -69,27 +69,27 @@ def cached(key_prefix: str, ttl: Optional[int] = None):
 			skip_cache = kwargs.pop("skip_cache", False)
 			if skip_cache:
 				return func(*args, **kwargs)
-			
+
 			# Generate cache key
 			cache_key = f"{CACHE_KEYS.get(key_prefix, key_prefix)}:{get_cache_key(*args, **kwargs)}"
-			
+
 			# Try to get from cache
 			cached_value = frappe.cache.get_value(cache_key)
 			if cached_value is not None:
 				return json.loads(cached_value) if isinstance(cached_value, str) else cached_value
-			
+
 			# Execute function
 			result = func(*args, **kwargs)
-			
+
 			# Cache result
 			if result is not None:
 				cache_ttl = ttl or CACHE_TTL.get(key_prefix, 300)
 				frappe.cache.set_value(
-					cache_key, 
+					cache_key,
 					json.dumps(result) if not isinstance(result, str) else result,
 					expires_in_sec=cache_ttl
 				)
-			
+
 			return result
 		return wrapper
 	return decorator
@@ -98,16 +98,16 @@ def cached(key_prefix: str, ttl: Optional[int] = None):
 class ETaxCache:
 	"""
 	Centralized cache manager for eTax.
-	
+
 	Provides:
 	- Token caching with expiry awareness
 	- Bulk cache operations
 	- Cache invalidation
 	- Cache statistics
 	"""
-	
+
 	@staticmethod
-	def get_token() -> Optional[dict]:
+	def get_token() -> dict | None:
 		"""Get cached token if not expired"""
 		token_data = frappe.cache.get_value(CACHE_KEYS["token"])
 		if token_data:
@@ -117,9 +117,9 @@ class ETaxCache:
 			if data.get("expires_at", 0) > time.time() + 60:
 				return data
 		return None
-	
+
 	@staticmethod
-	def set_token(token: str, expires_in: int, refresh_token: Optional[str] = None):
+	def set_token(token: str, expires_in: int, refresh_token: str | None = None):
 		"""Cache token with calculated expiry"""
 		import time
 		token_data = {
@@ -133,15 +133,15 @@ class ETaxCache:
 			json.dumps(token_data),
 			expires_in_sec=expires_in
 		)
-	
+
 	@staticmethod
-	def get_settings() -> Optional[dict]:
+	def get_settings() -> dict | None:
 		"""Get cached settings"""
 		cached = frappe.cache.get_value(CACHE_KEYS["settings"])
 		if cached:
 			return json.loads(cached) if isinstance(cached, str) else cached
 		return None
-	
+
 	@staticmethod
 	def set_settings(settings_dict: dict):
 		"""Cache settings"""
@@ -150,24 +150,24 @@ class ETaxCache:
 			json.dumps(settings_dict),
 			expires_in_sec=CACHE_TTL["settings"]
 		)
-	
+
 	@staticmethod
 	def invalidate_token():
 		"""Invalidate token cache"""
 		frappe.cache.delete_value(CACHE_KEYS["token"])
-	
+
 	@staticmethod
 	def invalidate_reports():
 		"""Invalidate report cache"""
 		# Delete all report-related cache keys
 		frappe.cache.delete_keys(f"{CACHE_KEYS['reports']}:*")
-	
+
 	@staticmethod
 	def invalidate_all():
 		"""Invalidate all eTax cache"""
 		for key in CACHE_KEYS.values():
 			frappe.cache.delete_keys(f"{key}*")
-	
+
 	@staticmethod
 	def get_stats() -> dict:
 		"""Get cache statistics"""
@@ -182,7 +182,7 @@ class ETaxCache:
 
 
 # Utility functions for direct cache access
-def get_cached_orgs(user_key: str) -> Optional[list]:
+def get_cached_orgs(user_key: str) -> list | None:
 	"""Get cached organizations"""
 	cache_key = f"{CACHE_KEYS['orgs']}:{user_key}"
 	cached = frappe.cache.get_value(cache_key)
@@ -201,7 +201,7 @@ def set_cached_orgs(user_key: str, orgs: list):
 	)
 
 
-def get_cached_form_detail(form_code: str) -> Optional[dict]:
+def get_cached_form_detail(form_code: str) -> dict | None:
 	"""Get cached form detail (long TTL)"""
 	cache_key = f"{CACHE_KEYS['form_detail']}:{form_code}"
 	cached = frappe.cache.get_value(cache_key)

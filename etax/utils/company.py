@@ -18,24 +18,23 @@ For multi-company support, use:
     entity = get_etax_entity("ABC LLC")
 """
 
-import frappe
-from typing import Optional
+
 
 # Re-export from mn_entity for convenience
 from etax.mn_entity import (
-    get_entity_for_doc,
-    get_entity_for_company,
-    get_etax_entity,
-    get_ebarimt_entity,
+    MNEntity,
     get_default_company,
+    get_ebarimt_entity,
+    get_entity_for_company,
+    get_entity_for_doc,
+    get_etax_entity,
     is_ebarimt_enabled,
     save_ent_id,
-    MNEntity,
 )
 
 __all__ = [
     "get_entity_for_doc",
-    "get_entity_for_company", 
+    "get_entity_for_company",
     "get_etax_entity",
     "get_ebarimt_entity",
     "get_default_company",
@@ -53,10 +52,10 @@ __all__ = [
 # Legacy functions (for backward compatibility)
 # =============================================================================
 
-def get_org_info(settings=None, company: Optional[str] = None, doc=None) -> dict:
+def get_org_info(settings=None, company: str | None = None, doc=None) -> dict:
     """
     DEPRECATED: Use get_entity_for_doc() or get_entity_for_company() instead.
-    
+
     Get organization info. Priority:
     1. doc (if provided) - uses doc.company
     2. company (if provided) - uses directly
@@ -65,14 +64,14 @@ def get_org_info(settings=None, company: Optional[str] = None, doc=None) -> dict
     """
     # Determine company
     company_name = None
-    
+
     if doc and hasattr(doc, "company"):
         company_name = doc.company
     elif company:
         company_name = company
     elif settings and hasattr(settings, "company"):
         company_name = settings.company
-    
+
     # If we have a company, use the new method
     if company_name:
         try:
@@ -90,7 +89,7 @@ def get_org_info(settings=None, company: Optional[str] = None, doc=None) -> dict
             }
         except Exception:
             pass
-    
+
     # Fall back to settings fields
     result = {
         "org_regno": None,
@@ -103,38 +102,38 @@ def get_org_info(settings=None, company: Optional[str] = None, doc=None) -> dict
         "company": None,
         "source": "settings"
     }
-    
+
     if settings:
         result["org_regno"] = getattr(settings, "org_regno", None)
         result["merchant_tin"] = getattr(settings, "merchant_tin", None)
         result["operator_tin"] = getattr(settings, "operator_tin", None)
         result["pos_no"] = getattr(settings, "pos_no", None)
         result["district_code"] = getattr(settings, "district_code", None)
-    
+
     return result
 
 
-def get_org_regno(settings=None, company: Optional[str] = None, doc=None) -> Optional[str]:
+def get_org_regno(settings=None, company: str | None = None, doc=None) -> str | None:
     """Get organization registry number (PIN)."""
     return get_org_info(settings, company, doc).get("org_regno")
 
 
-def get_tin(settings=None, company: Optional[str] = None, doc=None) -> Optional[str]:
+def get_tin(settings=None, company: str | None = None, doc=None) -> str | None:
     """Get TIN."""
     return get_org_info(settings, company, doc).get("tin")
 
 
-def get_merchant_tin(settings=None, company: Optional[str] = None, doc=None) -> Optional[str]:
+def get_merchant_tin(settings=None, company: str | None = None, doc=None) -> str | None:
     """Get merchant TIN."""
     return get_org_info(settings, company, doc).get("merchant_tin")
 
 
-def get_operator_tin(settings=None, company: Optional[str] = None, doc=None) -> Optional[str]:
+def get_operator_tin(settings=None, company: str | None = None, doc=None) -> str | None:
     """Get operator TIN."""
     return get_org_info(settings, company, doc).get("operator_tin")
 
 
-def get_pos_no(settings=None, company: Optional[str] = None, doc=None) -> Optional[str]:
+def get_pos_no(settings=None, company: str | None = None, doc=None) -> str | None:
     """Get POS number."""
     return get_org_info(settings, company, doc).get("pos_no")
 

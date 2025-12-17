@@ -9,12 +9,11 @@ Logs are stored in:
 - frappe.log file (for debug/info logs)
 """
 
-import frappe
-from frappe import _
-from typing import Optional, Dict, Any
 import json
 import traceback
 from functools import wraps
+
+import frappe
 
 
 # Logger instance for file logging
@@ -23,10 +22,10 @@ def get_logger():
     return frappe.logger("etax", allow_site=True, file_count=10)
 
 
-def log_info(message: str, data: Optional[Dict] = None):
+def log_info(message: str, data: dict | None = None):
     """
     Log info level message.
-    
+
     Args:
         message: Log message
         data: Optional additional data to log
@@ -38,7 +37,7 @@ def log_info(message: str, data: Optional[Dict] = None):
         logger.info(message)
 
 
-def log_debug(message: str, data: Optional[Dict] = None):
+def log_debug(message: str, data: dict | None = None):
     """Log debug level message."""
     logger = get_logger()
     if data:
@@ -47,7 +46,7 @@ def log_debug(message: str, data: Optional[Dict] = None):
         logger.debug(message)
 
 
-def log_warning(message: str, data: Optional[Dict] = None):
+def log_warning(message: str, data: dict | None = None):
     """Log warning level message."""
     logger = get_logger()
     if data:
@@ -56,25 +55,25 @@ def log_warning(message: str, data: Optional[Dict] = None):
         logger.warning(message)
 
 
-def log_error(message: str, data: Optional[Dict] = None, exc: Optional[Exception] = None):
+def log_error(message: str, data: dict | None = None, exc: Exception | None = None):
     """
     Log error to both file and Error Log DocType.
-    
+
     Args:
         message: Error message
         data: Optional additional data
         exc: Optional exception object
     """
     logger = get_logger()
-    
+
     error_details = {
         "message": message,
         "data": data,
         "traceback": traceback.format_exc() if exc else None
     }
-    
+
     logger.error(f"{message} | Details: {json.dumps(error_details, default=str)}")
-    
+
     # Also log to Error Log DocType for visibility in UI
     frappe.log_error(
         message=json.dumps(error_details, default=str, indent=2),
@@ -85,17 +84,17 @@ def log_error(message: str, data: Optional[Dict] = None, exc: Optional[Exception
 def log_api_call(
     endpoint: str,
     method: str = "POST",
-    request_data: Optional[Dict] = None,
-    response_data: Optional[Dict] = None,
+    request_data: dict | None = None,
+    response_data: dict | None = None,
     status: str = "Success",
-    error_message: Optional[str] = None,
-    reference_doctype: Optional[str] = None,
-    reference_name: Optional[str] = None,
-    execution_time: Optional[float] = None
+    error_message: str | None = None,
+    reference_doctype: str | None = None,
+    reference_name: str | None = None,
+    execution_time: float | None = None
 ):
     """
     Log API call to eTax Log DocType.
-    
+
     Args:
         endpoint: API endpoint called
         method: HTTP method (GET, POST, etc.)
@@ -118,7 +117,7 @@ def log_api_call(
                 "error": error_message
             })
             return
-        
+
         doc = frappe.get_doc({
             "doctype": "eTax Log",
             "endpoint": endpoint,
@@ -134,26 +133,26 @@ def log_api_call(
         doc.flags.ignore_permissions = True
         doc.insert()
         frappe.db.commit()
-        
+
     except Exception as e:
         # Don't let logging failures break the main flow
-        log_warning(f"Failed to create eTax Log: {str(e)}")
+        log_warning(f"Failed to create eTax Log: {e!s}")
 
 
 def log_tax_report(
     action: str,
     report_type: str,
-    company: Optional[str] = None,
-    fiscal_year: Optional[str] = None,
-    period: Optional[str] = None,
+    company: str | None = None,
+    fiscal_year: str | None = None,
+    period: str | None = None,
     status: str = "Pending",
-    submission_id: Optional[str] = None,
-    tax_amount: Optional[float] = None,
-    details: Optional[Dict] = None
+    submission_id: str | None = None,
+    tax_amount: float | None = None,
+    details: dict | None = None
 ):
     """
     Log eTax report event.
-    
+
     Args:
         action: Action performed (generate_report, submit_report, validate, etc.)
         report_type: Type of report (VAT, CIT, PIT, WHT, etc.)
@@ -175,7 +174,7 @@ def log_tax_report(
         "tax_amount": tax_amount,
         "details": details
     })
-    
+
     # Also log to Activity Log for audit trail
     try:
         frappe.get_doc({
@@ -203,7 +202,7 @@ def log_tax_report(
 def log_action(action_name: str):
     """
     Decorator to log function entry/exit and exceptions.
-    
+
     Usage:
         @log_action("Generate VAT Report")
         def generate_vat_report(company, period):
@@ -214,18 +213,18 @@ def log_action(action_name: str):
         def wrapper(*args, **kwargs):
             logger = get_logger()
             func_name = func.__name__
-            
+
             # Log entry
             logger.debug(f"[{action_name}] Starting {func_name}")
-            
+
             try:
                 result = func(*args, **kwargs)
                 logger.debug(f"[{action_name}] Completed {func_name}")
                 return result
             except Exception as e:
-                log_error(f"[{action_name}] Failed in {func_name}: {str(e)}", exc=e)
+                log_error(f"[{action_name}] Failed in {func_name}: {e!s}", exc=e)
                 raise
-        
+
         return wrapper
     return decorator
 
@@ -233,7 +232,7 @@ def log_action(action_name: str):
 def log_scheduler_task(task_name: str):
     """
     Decorator for scheduler tasks with comprehensive logging.
-    
+
     Usage:
         @log_scheduler_task("Auto Generate Tax Reports")
         def auto_generate_reports():
@@ -244,18 +243,18 @@ def log_scheduler_task(task_name: str):
         def wrapper(*args, **kwargs):
             import time
             start_time = time.time()
-            
+
             log_info(f"Scheduler Task Started: {task_name}")
-            
+
             try:
                 result = func(*args, **kwargs)
                 execution_time = time.time() - start_time
-                
+
                 log_info(f"Scheduler Task Completed: {task_name}", {
                     "execution_time_seconds": round(execution_time, 2),
                     "result": result if isinstance(result, (dict, list, str, int, float, bool)) else str(type(result))
                 })
-                
+
                 return result
             except Exception as e:
                 execution_time = time.time() - start_time
@@ -263,7 +262,7 @@ def log_scheduler_task(task_name: str):
                     "execution_time_seconds": round(execution_time, 2)
                 }, exc=e)
                 raise
-        
+
         return wrapper
     return decorator
 
@@ -289,7 +288,7 @@ def log_cit_report_generated(company: str, fiscal_year: str, taxable_income: flo
                    details={"taxable_income": taxable_income})
 
 
-def log_tin_lookup(tin: str, result: Dict, cached: bool = False):
+def log_tin_lookup(tin: str, result: dict, cached: bool = False):
     """Log TIN lookup."""
     log_info(f"TIN Lookup: {tin}", {
         "found": bool(result),

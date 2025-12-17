@@ -13,7 +13,6 @@ Called after app installation to set up:
 """
 
 import frappe
-from frappe import _
 
 
 def after_install():
@@ -29,27 +28,27 @@ def create_default_settings():
 	"""Create default eTax Settings if not exists"""
 	if not frappe.db.exists("DocType", "eTax Settings"):
 		return
-	
+
 	settings = frappe.get_single("eTax Settings")
 	needs_save = False
-	
+
 	# Set defaults if empty
 	if not settings.environment:
 		settings.environment = "Staging"
 		needs_save = True
-	
+
 	if not settings.timeout:
 		settings.timeout = 30
 		needs_save = True
-	
+
 	if not settings.api_base_url:
 		settings.api_base_url = "https://st-etax.mta.mn/api/beta"
 		needs_save = True
-	
+
 	if not settings.auth_url:
 		settings.auth_url = "https://api.frappe.mn/auth/itc-staging"
 		needs_save = True
-	
+
 	if needs_save:
 		# Use db_set to avoid validation issues with missing credentials
 		frappe.db.set_single_value("eTax Settings", "environment", settings.environment)
@@ -72,36 +71,36 @@ def after_migrate():
 
 def add_to_integrations_workspace():
 	"""Add eTax Settings to Integrations workspace under MN Settings section.
-	
+
 	Properly calculates idx to avoid conflicts with other apps.
 	Also updates the content JSON which controls the visual layout.
 	"""
 	import json
-	
+
 	if not frappe.db.exists("Workspace", "Integrations"):
 		return
-	
+
 	workspace = frappe.get_doc("Workspace", "Integrations")
-	
+
 	# Get the maximum idx to avoid conflicts
 	max_idx = max([link.idx or 0 for link in workspace.links] or [0])
-	
+
 	# Check if MN Settings section exists and eTax link exists
 	mn_settings_idx = None
 	etax_link_exists = False
-	
+
 	for link in workspace.links:
 		if link.type == "Card Break" and link.label == "MN Settings":
 			mn_settings_idx = link.idx
 		if link.link_to == "eTax Settings":
 			etax_link_exists = True
-	
+
 	# Already configured
 	if etax_link_exists:
 		return
-	
+
 	modified = False
-	
+
 	# Add MN Settings section if it doesn't exist
 	if mn_settings_idx is None:
 		max_idx += 1
@@ -111,7 +110,7 @@ def add_to_integrations_workspace():
 			"idx": max_idx,
 		})
 		modified = True
-	
+
 	# Add eTax Settings link with proper idx
 	max_idx = max([link.idx or 0 for link in workspace.links] or [0]) + 1
 	workspace.append("links", {
@@ -123,7 +122,7 @@ def add_to_integrations_workspace():
 		"idx": max_idx,
 	})
 	modified = True
-	
+
 	# Update content JSON to include MN Settings card (controls visual layout)
 	if workspace.content:
 		content = json.loads(workspace.content)
@@ -141,14 +140,14 @@ def add_to_integrations_workspace():
 			})
 			workspace.content = json.dumps(content)
 			modified = True
-	
+
 	if modified:
 		workspace.save()
 		frappe.db.commit()
-		
+
 		# Clear bootinfo cache so changes appear without hard refresh
 		frappe.cache.delete_key("bootinfo")
-		
+
 		print("  ✓ Added eTax Settings to Integrations workspace (MN Settings section)")
 
 
@@ -162,7 +161,7 @@ def remove_from_integrations_workspace():
 	"""Remove eTax Settings from Integrations workspace"""
 	if not frappe.db.exists("Workspace", "Integrations"):
 		return
-	
+
 	workspace = frappe.get_doc("Workspace", "Integrations")
 	workspace.links = [link for link in workspace.links if link.link_to != "eTax Settings"]
 	workspace.save()

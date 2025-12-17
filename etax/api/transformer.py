@@ -9,22 +9,22 @@ eTax API - Data Transformer Module
 Transforms data between eTax API format and Frappe DocType format.
 """
 
-import frappe
 from datetime import datetime
+
 
 
 class ETaxTransformer:
 	"""
 	Transform eTax API data to/from Frappe DocTypes.
-	
+
 	API -> DocType: api_to_*
 	DocType -> API: *_to_api
 	"""
-	
+
 	# =========================================================================
 	# Report Status Mapping
 	# =========================================================================
-	
+
 	# eTax status codes to names
 	STATUS_MAP = {
 		2: "New",           # Шинэ
@@ -33,7 +33,7 @@ class ETaxTransformer:
 		8: "Returned",      # Буцаасан
 		11: "Received"      # Хүлээн авсан
 	}
-	
+
 	STATUS_MAP_MN = {
 		2: "Шинэ",
 		3: "Илгээсэн",
@@ -41,18 +41,18 @@ class ETaxTransformer:
 		8: "Буцаасан",
 		11: "Хүлээн авсан"
 	}
-	
+
 	# =========================================================================
 	# Report List Transformation
 	# =========================================================================
-	
+
 	def api_to_report(self, api_data):
 		"""
 		Transform API report data to eTax Report DocType format.
-		
+
 		Args:
 			api_data: Report data from API (getList, getHistory)
-			
+
 		Returns:
 			dict: Data for eTax Report DocType
 		"""
@@ -82,14 +82,14 @@ class ETaxTransformer:
 			"sub_branch_code": api_data.get("subBranchCode"),
 			"sub_branch_name": api_data.get("subBranchName")
 		}
-	
+
 	def report_to_api(self, doc):
 		"""
 		Transform eTax Report DocType to API format for save/submit.
-		
+
 		Args:
 			doc: eTax Report document
-			
+
 		Returns:
 			dict: Data for API request
 		"""
@@ -106,24 +106,24 @@ class ETaxTransformer:
 			"fileGroupId": doc.file_group_id or "",
 			"reportStatusId": self._get_status_code(doc.status)
 		}
-	
+
 	# =========================================================================
 	# Form Data Transformation
 	# =========================================================================
-	
+
 	def api_to_form_data(self, api_data):
 		"""
 		Transform API form data to DocType format.
-		
+
 		Args:
 			api_data: Response from getFormData
-			
+
 		Returns:
 			dict: Form data and detail items
 		"""
 		report_data = api_data.get("reportData", {})
 		detail = api_data.get("reportDataDetail", [])
-		
+
 		form_data = {
 			"report_no": report_data.get("reportNo"),
 			"report_uuid": report_data.get("reportNoStr"),
@@ -147,7 +147,7 @@ class ETaxTransformer:
 			"submitted_date": self._parse_datetime(report_data.get("submittedDate")),
 			"done_date": self._parse_datetime(report_data.get("doneDate"))
 		}
-		
+
 		# Transform detail items
 		detail_items = []
 		for item in detail:
@@ -157,17 +157,17 @@ class ETaxTransformer:
 				"value": item.get("value"),
 				"type": item.get("type")
 			})
-		
+
 		return {"form_data": form_data, "detail_items": detail_items}
-	
+
 	def form_data_to_api(self, doc, detail_items):
 		"""
 		Transform form data DocType to API format.
-		
+
 		Args:
 			doc: eTax Report document
 			detail_items: List of data items
-			
+
 		Returns:
 			tuple: (report_data, report_data_detail)
 		"""
@@ -184,7 +184,7 @@ class ETaxTransformer:
 			"fileGroupId": "",
 			"reportStatusId": None
 		}
-		
+
 		report_data_detail = []
 		for item in detail_items:
 			report_data_detail.append({
@@ -197,26 +197,26 @@ class ETaxTransformer:
 				"type": item.type or 1,
 				"isValid": True
 			})
-		
+
 		return report_data, report_data_detail
-	
+
 	# =========================================================================
 	# Form Structure Transformation
 	# =========================================================================
-	
+
 	def api_to_form_structure(self, api_data):
 		"""
 		Transform API form structure to DocType format.
-		
+
 		Args:
 			api_data: Response from getFormDetail
-			
+
 		Returns:
 			dict: Form structure data
 		"""
 		form_info = api_data.get("reportFormInfo", {})
 		sections = api_data.get("sections", [])
-		
+
 		structure = {
 			"report_code": form_info.get("reportCode"),
 			"form_no": form_info.get("formNo"),
@@ -227,7 +227,7 @@ class ETaxTransformer:
 			"version": form_info.get("version"),
 			"sections": []
 		}
-		
+
 		# Transform sections
 		for section in sections:
 			section_data = {
@@ -240,7 +240,7 @@ class ETaxTransformer:
 				"headers": section.get("headers", []),
 				"rows": []
 			}
-			
+
 			# Transform rows
 			for row in section.get("rows", []):
 				row_data = {
@@ -248,7 +248,7 @@ class ETaxTransformer:
 					"hidden": row.get("hidden", False),
 					"cells": []
 				}
-				
+
 				# Transform cells
 				for cell in row.get("cells", []):
 					cell_data = {
@@ -269,24 +269,24 @@ class ETaxTransformer:
 						"validations": cell.get("validations", [])
 					}
 					row_data["cells"].append(cell_data)
-				
+
 				section_data["rows"].append(row_data)
-			
+
 			structure["sections"].append(section_data)
-		
+
 		return structure
-	
+
 	# =========================================================================
 	# Sheet Data Transformation
 	# =========================================================================
-	
+
 	def api_to_sheet_data(self, api_data):
 		"""
 		Transform API sheet data to DocType format.
-		
+
 		Args:
 			api_data: Response from getSheetData
-			
+
 		Returns:
 			dict: Sheet data
 		"""
@@ -305,22 +305,22 @@ class ETaxTransformer:
 				for item in api_data.get("sheetDataDetail", [])
 			]
 		}
-	
+
 	def sheet_data_to_api(self, sheet_form_no, sheet_code, report_no, rows):
 		"""
 		Transform sheet data to API format for save.
-		
+
 		Args:
 			sheet_form_no: Sheet form number
 			sheet_code: Sheet code
 			report_no: Report ID
 			rows: List of row data
-			
+
 		Returns:
 			dict: API request payload
 		"""
 		sheet_data_detail = []
-		
+
 		for row in rows:
 			cells = []
 			for cell in row.get("cells", []):
@@ -332,7 +332,7 @@ class ETaxTransformer:
 					"errType": "",
 					"errMsg": ""
 				})
-			
+
 			sheet_data_detail.append({
 				"rowNumber": row.get("row_number"),
 				"isTotal": 1 if row.get("is_total") else 0,
@@ -341,32 +341,32 @@ class ETaxTransformer:
 				"type": row.get("type"),
 				"cells": cells
 			})
-		
+
 		return {
 			"sheetFormNo": sheet_form_no,
 			"sheetCode": sheet_code,
 			"reportNo": report_no,
 			"sheetDataDetail": sheet_data_detail
 		}
-	
+
 	# =========================================================================
 	# Taxpayer/Organization Transformation
 	# =========================================================================
-	
+
 	def api_to_taxpayer(self, api_data):
 		"""
 		Transform API organization data to eTax Taxpayer DocType.
-		
+
 		Args:
 			api_data: Response from getUserOrgs
-			
+
 		Returns:
 			dict: Data for eTax Taxpayer DocType
 		"""
 		branch_view = api_data.get("taxpayerBranchView", {})
 		ref_ent_type = api_data.get("refEntType", {})
 		ref_status = api_data.get("refEntStatus", {})
-		
+
 		return {
 			"ent_id": api_data.get("id"),
 			"tin": api_data.get("Tin"),
@@ -385,51 +385,51 @@ class ETaxTransformer:
 			"agree_general_role_user": api_data.get("agreeGeneralRoleUser"),
 			"ebarimt_login": api_data.get("ebarimtLogin")
 		}
-	
+
 	# =========================================================================
 	# Helper Methods
 	# =========================================================================
-	
+
 	def _parse_date(self, date_str):
 		"""Parse date string to date object"""
 		if not date_str:
 			return None
-		
+
 		try:
 			if isinstance(date_str, datetime):
 				return date_str.date()
-			
+
 			# Try common formats
 			for fmt in ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S"]:
 				try:
 					return datetime.strptime(date_str, fmt).date()
 				except ValueError:
 					continue
-			
+
 			return None
 		except Exception:
 			return None
-	
+
 	def _parse_datetime(self, dt_str):
 		"""Parse datetime string to datetime object"""
 		if not dt_str:
 			return None
-		
+
 		try:
 			if isinstance(dt_str, datetime):
 				return dt_str
-			
+
 			# Try common formats
 			for fmt in ["%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]:
 				try:
 					return datetime.strptime(dt_str, fmt)
 				except ValueError:
 					continue
-			
+
 			return None
 		except Exception:
 			return None
-	
+
 	def _get_status_code(self, status_name):
 		"""Get status code from status name"""
 		reverse_map = {v: k for k, v in self.STATUS_MAP.items()}

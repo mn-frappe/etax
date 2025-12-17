@@ -20,16 +20,17 @@ Performance optimizations:
 - Keep-alive connections
 """
 
-import frappe
 import json
 import time
-from typing import Optional
+
+import frappe
+
 from etax.api.pool import get_session
 
 
 class ETaxHTTPError(Exception):
 	"""HTTP error for eTax API"""
-	
+
 	def __init__(self, message, status_code=None, response_data=None):
 		super().__init__(message)
 		self.status_code = status_code
@@ -39,116 +40,116 @@ class ETaxHTTPError(Exception):
 class ETaxHTTPClient:
 	"""
 	HTTP client for eTax API with NE-KEY support.
-	
+
 	Key features:
 	- Routes through api.frappe.mn gateway (Mongolian IP requirement)
 	- NE-KEY header automatically added to all requests
 	- Authorization header management
 	- Error handling and logging
 	- Debug mode support
-	
+
 	eTax API Response codes:
 	- 200: Success
 	- 201: Please retry
 	- 400: Invalid parameters
 	- 500: Internal server error
 	"""
-	
+
 	# API Gateway
 	GATEWAY_URL = "https://api.frappe.mn"
 	GATEWAY_PATHS = {
 		"Staging": "/etax-staging",
 		"Production": "/etax"
 	}
-	
+
 	def __init__(self, settings=None):
 		"""
 		Initialize HTTP client.
-		
+
 		Args:
 			settings: eTax Settings doc or None
 		"""
 		self.settings = settings or self._get_settings()
 		self._session = None
-	
+
 	@property
 	def session(self):
 		"""Get pooled HTTP session for connection reuse"""
 		if self._session is None:
 			self._session = get_session()
 		return self._session
-	
+
 	def _get_settings(self):
 		"""Get eTax Settings singleton"""
 		try:
 			return frappe.get_single("eTax Settings")
 		except Exception:
 			return None
-	
+
 	@property
 	def environment(self):
 		"""Get current environment"""
 		if self.settings:
 			return self.settings.environment or "Staging"
 		return "Staging"
-	
+
 	@property
 	def base_url(self):
 		"""Get API base URL via gateway"""
 		gateway_path = self.GATEWAY_PATHS.get(self.environment, self.GATEWAY_PATHS["Staging"])
 		return f"{self.GATEWAY_URL}{gateway_path}"
-	
+
 	@property
 	def timeout(self):
 		"""Get request timeout"""
 		if self.settings:
 			return self.settings.timeout or 30
 		return 30
-	
+
 	@property
 	def debug_mode(self):
 		"""Check if debug mode is enabled"""
 		return self.settings and self.settings.debug_mode
-	
+
 	def _get_ne_key(self):
 		"""Get NE-KEY from settings"""
 		if self.settings:
 			return self.settings.get_password("ne_key")
 		return None
-	
+
 	def _build_url(self, endpoint):
 		"""
 		Build full URL from endpoint via gateway.
-		
+
 		Gateway mapping:
 		- /etax-staging/user/orgs → st-etax.mta.mn/api/user/orgs
 		- /etax-staging/forms → st-etax.mta.mn/api/beta/forms
 		"""
 		if endpoint.startswith("http"):
 			return endpoint
-		
+
 		# Clean up endpoint
 		endpoint = endpoint.lstrip("/")
-		
+
 		# Handle /api/user/ endpoints (different path on gateway)
 		if endpoint.startswith("api/user/") or endpoint.startswith("user/"):
 			# Use /etax-staging/user/ gateway path
 			user_path = endpoint.replace("api/user/", "").replace("user/", "")
 			gateway_path = self.GATEWAY_PATHS.get(self.environment, self.GATEWAY_PATHS["Staging"])
 			return f"{self.GATEWAY_URL}{gateway_path}/user/{user_path}"
-		
+
 		# Standard /api/beta/ endpoints use base gateway path
 		return f"{self.base_url}/{endpoint}"
-	
+
 	def _get_headers(self, auth_header=None, extra_headers=None, content_type="application/json"):
 		"""
 		Build request headers.
-		
+
 		Args:
 			auth_header: Authorization header dict
 			extra_headers: Additional headers
 			content_type: Content-Type header value
-			
+
 		Returns:
 			dict: Complete headers
 		"""
@@ -156,32 +157,32 @@ class ETaxHTTPClient:
 			"Content-Type": content_type,
 			"Accept": "application/json"
 		}
-		
+
 		# Add NE-KEY (required for all eTax API calls)
 		ne_key = self._get_ne_key()
 		if ne_key:
 			headers["NE-KEY"] = ne_key
-		
+
 		# Add authorization
 		if auth_header:
 			headers.update(auth_header)
-		
+
 		# Add extra headers
 		if extra_headers:
 			headers.update(extra_headers)
-		
+
 		return headers
-	
+
 	def _log_request(self, method, url, headers, data=None, params=None):
 		"""Log request details in debug mode"""
 		if not self.debug_mode:
 			return
-		
+
 		# Sanitize headers (remove sensitive data)
 		safe_headers = {k: v for k, v in headers.items() if k.lower() not in ("authorization", "ne-key")}
 		safe_headers["Authorization"] = "Bearer ***" if "Authorization" in headers else None
 		safe_headers["NE-KEY"] = "***" if "NE-KEY" in headers else None
-		
+
 		log_msg = f"""
 eTax API Request:
 - Method: {method}
@@ -191,18 +192,18 @@ eTax API Request:
 - Body: {json.dumps(data, indent=2, ensure_ascii=False)[:1000] if data else None}
 """
 		frappe.log_error(log_msg, "eTax HTTP Debug - Request")
-	
+
 	def _log_response(self, response, duration=None):
 		"""Log response details in debug mode"""
 		if not self.debug_mode:
 			return
-		
+
 		try:
 			response_body = response.json()
 			response_str = json.dumps(response_body, indent=2, ensure_ascii=False)[:2000]
 		except Exception:
 			response_str = response.text[:2000]
-		
+
 		log_msg = f"""
 eTax API Response:
 - Status: {response.status_code}
@@ -210,17 +211,17 @@ eTax API Response:
 - Body: {response_str}
 """
 		frappe.log_error(log_msg, "eTax HTTP Debug - Response")
-	
+
 	def _handle_response(self, response):
 		"""
 		Handle API response.
-		
+
 		Args:
 			response: requests.Response object
-			
+
 		Returns:
 			dict or list: Response data
-			
+
 		Raises:
 			ETaxHTTPError: On error response
 		"""
@@ -233,46 +234,45 @@ eTax API Response:
 					status_code=response.status_code
 				)
 			return {"raw_response": response.text}
-		
+
 		# If response is a list (e.g., getUserOrgs), return directly
 		if isinstance(data, list):
 			return data
-		
+
 		# Check for eTax API error codes
 		code = data.get("code")
 		if code is not None and code != 0:
 			message = data.get("message", f"Error code: {code}")
 			raise ETaxHTTPError(message, status_code=code, response_data=data)
-		
+
 		# Check HTTP status
 		if response.status_code >= 400:
-			message = data.get("error_description", 
-				data.get("error", 
+			message = data.get("error_description",
+				data.get("error",
 				data.get("message", f"HTTP {response.status_code}")))
 			raise ETaxHTTPError(message, status_code=response.status_code, response_data=data)
-		
+
 		return data
-	
+
 	def get(self, endpoint, auth_header=None, headers=None, params=None):
 		"""
 		Make GET request to eTax API.
-		
+
 		Args:
 			endpoint: API endpoint path
 			auth_header: Authorization header
 			headers: Additional headers
 			params: Query parameters
-			
+
 		Returns:
 			dict: Response data
 		"""
-		import time
-		
+
 		url = self._build_url(endpoint)
 		request_headers = self._get_headers(auth_header, headers)
-		
+
 		self._log_request("GET", url, request_headers, params=params)
-		
+
 		start_time = time.time()
 		try:
 			response = self.session.get(
@@ -284,35 +284,34 @@ eTax API Response:
 		except Exception as e:
 			if "timeout" in str(e).lower():
 				raise ETaxHTTPError(f"Request timeout after {self.timeout}s", status_code=408)
-			raise ETaxHTTPError(f"Connection error: {str(e)}", status_code=503)
+			raise ETaxHTTPError(f"Connection error: {e!s}", status_code=503)
 		finally:
 			duration = round(time.time() - start_time, 3)
-		
+
 		self._log_response(response, duration)
-		
+
 		return self._handle_response(response)
-	
+
 	def post(self, endpoint, data=None, auth_header=None, headers=None, params=None):
 		"""
 		Make POST request to eTax API.
-		
+
 		Args:
 			endpoint: API endpoint path
 			data: Request body (dict)
 			auth_header: Authorization header
 			headers: Additional headers
 			params: Query parameters
-			
+
 		Returns:
 			dict: Response data
 		"""
-		import time
-		
+
 		url = self._build_url(endpoint)
 		request_headers = self._get_headers(auth_header, headers)
-		
+
 		self._log_request("POST", url, request_headers, data=data, params=params)
-		
+
 		start_time = time.time()
 		try:
 			response = self.session.post(
@@ -325,12 +324,12 @@ eTax API Response:
 		except Exception as e:
 			if "timeout" in str(e).lower():
 				raise ETaxHTTPError(f"Request timeout after {self.timeout}s", status_code=408)
-			raise ETaxHTTPError(f"Connection error: {str(e)}", status_code=503)
+			raise ETaxHTTPError(f"Connection error: {e!s}", status_code=503)
 		finally:
 			duration = round(time.time() - start_time, 3)
-		
+
 		self._log_response(response, duration)
-		
+
 		return self._handle_response(response)
 
 

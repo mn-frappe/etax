@@ -42,10 +42,10 @@ Usage:
     # From a document (preferred)
     doc = frappe.get_doc("Sales Invoice", "SINV-00001")
     entity = get_entity_for_doc(doc)
-    
+
     # Or from company name directly
     entity = get_entity_for_company("ABC LLC")
-    
+
     # Access entity info
     tin = entity.tin
     merchant_tin = entity.merchant_tin
@@ -63,33 +63,34 @@ Entity Object Properties:
     - ebarimt_enabled: Is eBarimt enabled - Company.custom_ebarimt_enabled
 """
 
+from dataclasses import dataclass
+from typing import Any
+
 import frappe
 from frappe import _
-from typing import Optional, Union, Any
-from dataclasses import dataclass
 
 
 @dataclass
 class MNEntity:
     """
     Represents a Mongolian business entity with all tax-related identifiers.
-    
+
     This is the unified entity object that all MN apps should use.
     """
     company: str
-    org_regno: Optional[str] = None      # PIN / Registry Number (Company.tax_id)
-    tin: Optional[str] = None            # TIN (Company.custom_tin)
-    ent_id: Optional[str] = None         # MTA Entity ID (Company.custom_ent_id)
-    merchant_tin: Optional[str] = None   # eBarimt Merchant TIN
-    operator_tin: Optional[str] = None   # eBarimt Operator TIN
-    pos_no: Optional[str] = None         # eBarimt POS Number
-    district_code: Optional[str] = None  # Default District Code
+    org_regno: str | None = None      # PIN / Registry Number (Company.tax_id)
+    tin: str | None = None            # TIN (Company.custom_tin)
+    ent_id: str | None = None         # MTA Entity ID (Company.custom_ent_id)
+    merchant_tin: str | None = None   # eBarimt Merchant TIN
+    operator_tin: str | None = None   # eBarimt Operator TIN
+    pos_no: str | None = None         # eBarimt POS Number
+    district_code: str | None = None  # Default District Code
     ebarimt_enabled: bool = False        # Is eBarimt enabled for this company
-    
+
     def validate(self, require_ebarimt: bool = False) -> None:
         """
         Validate that required fields are present.
-        
+
         Raises:
             frappe.ValidationError: If required fields are missing
         """
@@ -98,7 +99,7 @@ class MNEntity:
                 _("Company {0} does not have Tax ID (PIN) configured").format(self.company),
                 title=_("Missing Tax ID")
             )
-        
+
         if require_ebarimt:
             if not self.merchant_tin:
                 frappe.throw(
@@ -110,7 +111,7 @@ class MNEntity:
                     _("Company {0} does not have POS Number configured").format(self.company),
                     title=_("Missing POS Number")
                 )
-    
+
     def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
@@ -129,21 +130,21 @@ class MNEntity:
 def get_entity_for_company(company_name: str) -> MNEntity:
     """
     Get MN entity configuration for a specific company.
-    
+
     Args:
         company_name: ERPNext Company name
-        
+
     Returns:
         MNEntity object with all tax identifiers
-        
+
     Raises:
         frappe.DoesNotExistError: If company doesn't exist
     """
     if not company_name:
         frappe.throw(_("Company is required"), title=_("Missing Company"))
-    
+
     company = frappe.get_cached_doc("Company", company_name)
-    
+
     return MNEntity(
         company=company_name,
         org_regno=company.tax_id or None,  # type: ignore
@@ -157,25 +158,25 @@ def get_entity_for_company(company_name: str) -> MNEntity:
     )
 
 
-def get_entity_for_doc(doc: Any, doctype: Optional[str] = None) -> MNEntity:
+def get_entity_for_doc(doc: Any, doctype: str | None = None) -> MNEntity:
     """
     Get MN entity configuration from a document's company.
-    
+
     This is the PRIMARY method all MN apps should use. It ensures that
     all apps use the same company/entity for a given document.
-    
+
     Args:
         doc: Document object or document name
         doctype: DocType name (required if doc is a string)
-        
+
     Returns:
         MNEntity object with all tax identifiers
-        
+
     Example:
         # From document object
         sinv = frappe.get_doc("Sales Invoice", "SINV-00001")
         entity = get_entity_for_doc(sinv)
-        
+
         # From document name
         entity = get_entity_for_doc("SINV-00001", "Sales Invoice")
     """
@@ -184,23 +185,23 @@ def get_entity_for_doc(doc: Any, doctype: Optional[str] = None) -> MNEntity:
         if not doctype:
             frappe.throw(_("DocType is required when passing document name"))
         doc = frappe.get_doc(doctype, doc)  # type: ignore
-    
+
     # Get company from document
     company_name = getattr(doc, "company", None)
-    
+
     if not company_name:
         frappe.throw(
             _("{0} {1} does not have a company").format(doc.doctype, doc.name),
             title=_("Missing Company")
         )
-    
+
     return get_entity_for_company(company_name)  # type: ignore
 
 
 def save_ent_id(company_name: str, ent_id: str) -> None:
     """
     Save MTA Entity ID to Company after successful MTA registration/login.
-    
+
     Args:
         company_name: ERPNext Company name
         ent_id: Entity ID from MTA
@@ -210,10 +211,10 @@ def save_ent_id(company_name: str, ent_id: str) -> None:
         frappe.clear_cache(doctype="Company")
 
 
-def get_default_company() -> Optional[str]:
+def get_default_company() -> str | None:
     """
     Get the default company for single-company setups or current user's default.
-    
+
     Returns:
         Company name or None
     """
@@ -221,17 +222,17 @@ def get_default_company() -> Optional[str]:
     default = frappe.defaults.get_user_default("company")  # type: ignore
     if default:
         return default
-    
+
     # Try global default
     default = frappe.defaults.get_global_default("company")  # type: ignore
     if default:
         return default
-    
+
     # If only one company exists, use it
     companies = frappe.get_all("Company", limit=2)
     if len(companies) == 1:
         return companies[0].name
-    
+
     return None
 
 
@@ -242,10 +243,10 @@ def get_default_company() -> Optional[str]:
 def get_etax_entity(doc_or_company) -> MNEntity:
     """
     Get entity for eTax operations.
-    
+
     Args:
         doc_or_company: Document object or company name
-        
+
     Returns:
         MNEntity with org_regno and tin validated
     """
@@ -253,7 +254,7 @@ def get_etax_entity(doc_or_company) -> MNEntity:
         entity = get_entity_for_company(doc_or_company)
     else:
         entity = get_entity_for_doc(doc_or_company)
-    
+
     entity.validate()
     return entity
 
@@ -261,10 +262,10 @@ def get_etax_entity(doc_or_company) -> MNEntity:
 def get_ebarimt_entity(doc_or_company) -> MNEntity:
     """
     Get entity for eBarimt operations.
-    
+
     Args:
         doc_or_company: Document object or company name
-        
+
     Returns:
         MNEntity with merchant info validated
     """
@@ -272,7 +273,7 @@ def get_ebarimt_entity(doc_or_company) -> MNEntity:
         entity = get_entity_for_company(doc_or_company)
     else:
         entity = get_entity_for_doc(doc_or_company)
-    
+
     entity.validate(require_ebarimt=True)
     return entity
 
@@ -280,10 +281,10 @@ def get_ebarimt_entity(doc_or_company) -> MNEntity:
 def is_ebarimt_enabled(company_name: str) -> bool:
     """
     Check if eBarimt is enabled for a company.
-    
+
     Args:
         company_name: ERPNext Company name
-        
+
     Returns:
         True if eBarimt is enabled for this company
     """
@@ -298,14 +299,14 @@ def is_ebarimt_enabled(company_name: str) -> bool:
 # =============================================================================
 
 @frappe.whitelist()
-def get_entity_info(company: Optional[str] = None, doctype: Optional[str] = None, docname: Optional[str] = None) -> dict:
+def get_entity_info(company: str | None = None, doctype: str | None = None, docname: str | None = None) -> dict:
     """
     Get entity info for JavaScript.
-    
+
     Can be called with either:
     - company: Company name directly
     - doctype + docname: Get company from document
-    
+
     Returns:
         dict with entity info
     """
@@ -319,5 +320,5 @@ def get_entity_info(company: Optional[str] = None, doctype: Optional[str] = None
             entity = get_entity_for_company(company)
         else:
             return {"error": "No company specified"}
-    
+
     return entity.to_dict()

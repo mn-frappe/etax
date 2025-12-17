@@ -10,20 +10,20 @@ Provides VAT data caching, pre-aggregation, and performance optimizations
 for tax reporting operations.
 """
 
-import frappe
-from frappe import _
-from frappe.utils import flt, getdate, add_months, get_first_day, get_last_day
-from typing import Optional, List, Dict, Any
-import time
 import functools
+import time
+from typing import Any
+
+import frappe
+from frappe.utils import flt, get_first_day, get_last_day, getdate
 
 # Import logger utilities
 from etax.logger import (
-    log_info, log_debug, log_warning, log_error,
-    log_api_call, log_tax_report, log_scheduler_task,
-    log_tin_lookup, log_cache_operation
+    log_debug,
+    log_error,
+    log_info,
+    log_scheduler_task,
 )
-
 
 # =============================================================================
 # Performance Indexes
@@ -64,12 +64,12 @@ def ensure_indexes():
             index_name = idx["name"]
             table = idx["table"]
             columns = ", ".join([f"`{c}`" for c in idx["columns"]])
-            
+
             # Check if index exists
             existing = frappe.db.sql(f"""
                 SHOW INDEX FROM `{table}` WHERE Key_name = %s
             """, (index_name,))
-            
+
             if not existing:
                 frappe.db.sql(f"""
                     CREATE INDEX `{index_name}` ON `{table}` ({columns})
@@ -107,29 +107,29 @@ def invalidate_cache(pattern: str):
 # TIN Lookup Caching
 # =============================================================================
 
-def get_taxpayer_info_cached(tin: str, validate: bool = False) -> Optional[Dict]:
+def get_taxpayer_info_cached(tin: str, validate: bool = False) -> dict | None:
     """
     Get taxpayer info from cache or API.
-    
+
     Args:
         tin: Taxpayer Identification Number
         validate: If True, validates with eTax API
-        
+
     Returns:
         Taxpayer information dict or None
     """
     if not tin:
         return None
-    
+
     # Clean TIN
     tin = str(tin).strip().replace(" ", "")
-    
+
     key = cache_key("taxpayer", tin)
     cached = get_cached(key)
-    
+
     if cached and not validate:
         return cached
-    
+
     # Check local database first
     local = frappe.get_value(
         "eTax Taxpayer",
@@ -137,20 +137,20 @@ def get_taxpayer_info_cached(tin: str, validate: bool = False) -> Optional[Dict]
         ["name", "tin", "company_name", "company_name_en", "address"],
         as_dict=True
     )
-    
+
     if local:
         if isinstance(local, dict):
             set_cached(key, local, ttl=86400)  # Cache for 24 hours
             return local
         return None
-    
+
     # Validate with API if requested
     if validate:
         try:
             from etax.api.client import ETaxClient
             client = ETaxClient()
             api_data = client.get_taxpayer_info(tin) if hasattr(client, "get_taxpayer_info") else None
-            
+
             if api_data:
                 # Save locally
                 taxpayer = frappe.new_doc("eTax Taxpayer")
@@ -160,28 +160,28 @@ def get_taxpayer_info_cached(tin: str, validate: bool = False) -> Optional[Dict]
                 taxpayer.address = api_data.get("address", "")
                 taxpayer.flags.ignore_permissions = True
                 taxpayer.save()
-                
+
                 set_cached(key, api_data, ttl=86400)
                 return api_data
         except Exception as e:
             frappe.logger("etax").warning(f"Failed to validate TIN {tin}: {e}")
-    
+
     return None
 
 
-def batch_validate_tins(tins: List[str]) -> Dict[str, Dict]:
+def batch_validate_tins(tins: list[str]) -> dict[str, dict]:
     """
     Batch validate TINs for better performance.
-    
+
     Args:
         tins: List of TINs to validate
-        
+
     Returns:
         Dict mapping TIN to taxpayer info
     """
     results = {}
     to_validate = []
-    
+
     # Check cache first
     for tin in tins:
         if not tin:
@@ -192,7 +192,7 @@ def batch_validate_tins(tins: List[str]) -> Dict[str, Dict]:
             results[tin] = cached
         else:
             to_validate.append(tin)
-    
+
     # Batch validate remaining
     if to_validate:
         # Use background job for large batches
@@ -208,11 +208,11 @@ def batch_validate_tins(tins: List[str]) -> Dict[str, Dict]:
             for tin in to_validate:
                 info = get_taxpayer_info_cached(tin, validate=True)
                 results[tin] = info or {"tin": tin, "status": "not_found"}
-    
+
     return results
 
 
-def _batch_validate_tins_worker(tins: List[str]):
+def _batch_validate_tins_worker(tins: list[str]):
     """Background worker for batch TIN validation."""
     for tin in tins:
         try:
@@ -229,36 +229,36 @@ def get_vat_sales_summary_cached(
     company: str,
     period: str,
     force_refresh: bool = False
-) -> Dict:
+) -> dict:
     """
     Get VAT sales summary from cache or calculate.
-    
+
     Args:
         company: Company name
         period: Period string (e.g., "2024-01")
         force_refresh: Force recalculation
-        
+
     Returns:
         VAT sales summary dict
     """
     key = cache_key("vat_sales", company, period)
-    
+
     if not force_refresh:
         cached = get_cached(key)
         if cached:
             return cached
-    
+
     # Calculate from Sales Invoices
     result = calculate_vat_sales_summary(company, period)
     set_cached(key, result, ttl=3600)
-    
+
     return result
 
 
-def calculate_vat_sales_summary(company: str, period: str) -> Dict:
+def calculate_vat_sales_summary(company: str, period: str) -> dict:
     """
     Calculate VAT sales summary for a period.
-    
+
     Args:
         company: Company name
         period: Period string (e.g., "2024-01")
@@ -266,10 +266,10 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
     year, month = map(int, period.split("-"))
     month_start = get_first_day(f"{year}-{month:02d}-01")
     month_end = get_last_day(month_start)
-    
+
     # Get all sales invoices for the period
     inv_result = list(frappe.db.sql("""
-        SELECT 
+        SELECT
             COUNT(*) as count,
             COALESCE(SUM(base_net_total), 0) as net_total,
             COALESCE(SUM(total_taxes_and_charges), 0) as vat_amount,
@@ -280,10 +280,10 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
         AND docstatus = 1
     """, (company, month_start, month_end), as_dict=True))
     invoices = inv_result[0] if inv_result else {"count": 0, "net_total": 0, "vat_amount": 0, "grand_total": 0}
-    
+
     # Get by customer type (domestic vs export)
     dom_result = list(frappe.db.sql("""
-        SELECT 
+        SELECT
             COUNT(*) as count,
             COALESCE(SUM(base_net_total), 0) as net_total,
             COALESCE(SUM(total_taxes_and_charges), 0) as vat_amount,
@@ -296,7 +296,7 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
         AND COALESCE(territory, '') NOT IN ('Foreign', 'Export', 'International')
     """, (company, month_start, month_end), as_dict=True))
     domestic = dom_result[0] if dom_result else {"count": 0, "net_total": 0, "vat_amount": 0, "grand_total": 0}
-    
+
     inv_count = int(invoices.get("count", 0) or 0)
     dom_count = int(domestic.get("count", 0) or 0)
     inv_net = flt(invoices.get("net_total", 0))
@@ -305,7 +305,7 @@ def calculate_vat_sales_summary(company: str, period: str) -> Dict:
     dom_vat = flt(domestic.get("vat_amount", 0))
     inv_grand = flt(invoices.get("grand_total", 0))
     dom_grand = flt(domestic.get("grand_total", 0))
-    
+
     return {
         "company": company,
         "period": period,
@@ -334,33 +334,33 @@ def get_vat_purchase_summary_cached(
     company: str,
     period: str,
     force_refresh: bool = False
-) -> Dict:
+) -> dict:
     """
     Get VAT purchase summary from cache or calculate.
     """
     key = cache_key("vat_purchase", company, period)
-    
+
     if not force_refresh:
         cached = get_cached(key)
         if cached:
             return cached
-    
+
     result = calculate_vat_purchase_summary(company, period)
     set_cached(key, result, ttl=3600)
-    
+
     return result
 
 
-def calculate_vat_purchase_summary(company: str, period: str) -> Dict:
+def calculate_vat_purchase_summary(company: str, period: str) -> dict:
     """
     Calculate VAT purchase summary for a period.
     """
     year, month = map(int, period.split("-"))
     month_start = get_first_day(f"{year}-{month:02d}-01")
     month_end = get_last_day(month_start)
-    
+
     inv_result = list(frappe.db.sql("""
-        SELECT 
+        SELECT
             COUNT(*) as count,
             COALESCE(SUM(base_net_total), 0) as net_total,
             COALESCE(SUM(total_taxes_and_charges), 0) as vat_amount,
@@ -371,7 +371,7 @@ def calculate_vat_purchase_summary(company: str, period: str) -> Dict:
         AND docstatus = 1
     """, (company, month_start, month_end), as_dict=True))
     invoices = inv_result[0] if inv_result else {"count": 0, "net_total": 0, "vat_amount": 0, "grand_total": 0}
-    
+
     return {
         "company": company,
         "period": period,
@@ -396,21 +396,21 @@ def auto_sync_tax_reports():
     settings = frappe.get_single("eTax Settings")
     if not getattr(settings, "auto_sync_reports", False):
         return
-    
+
     try:
         from etax.api.client import ETaxClient
         client = ETaxClient()
-        
+
         # Fetch report periods from API
         periods = client.get_report_periods() if hasattr(client, "get_report_periods") else []
-        
+
         for period in periods:
             frappe.enqueue(
                 "etax.setup.sync.sync_report_period",
                 period_data=period,
                 queue="short"
             )
-            
+
     except Exception as e:
         frappe.log_error(f"Auto-sync tax reports failed: {e}")
 
@@ -425,7 +425,7 @@ def auto_submit_vat_reports():
     if not getattr(settings, "auto_fetch_reports", False):
         log_debug("Auto submit disabled - skipping")
         return {"status": "skipped", "reason": "auto_submit_disabled"}
-    
+
     # Find reports due for submission
     due_reports = frappe.get_all(
         "eTax Report Period",
@@ -436,10 +436,10 @@ def auto_submit_vat_reports():
         fields=["name", "company", "period_name"],
         limit=10
     )
-    
+
     submitted_count = 0
     error_count = 0
-    
+
     for report in due_reports:
         try:
             frappe.enqueue(
@@ -448,12 +448,12 @@ def auto_submit_vat_reports():
                 queue="long",
                 timeout=600
             )
-            log_info(f"Queued VAT report submission", {"report": report.name, "company": report.company, "period": report.period_name})
+            log_info("Queued VAT report submission", {"report": report.name, "company": report.company, "period": report.period_name})
             submitted_count += 1
         except Exception as e:
             log_error(f"Failed to queue report submission {report.name}", exc=e)
             error_count += 1
-    
+
     return {"submitted": submitted_count, "errors": error_count, "total_found": len(due_reports)}
 
 
@@ -467,19 +467,19 @@ def on_invoice_update(doc, method=None):
     """
     if not doc.company or not doc.posting_date:
         return
-    
+
     posting_date = getdate(doc.posting_date)
     if not posting_date:
         return
-        
+
     period = f"{posting_date.year}-{posting_date.month:02d}"
-    
+
     # Determine invoice type
     if doc.doctype == "Sales Invoice":
         key = cache_key("vat_sales", doc.company, period)
     else:
         key = cache_key("vat_purchase", doc.company, period)
-    
+
     frappe.cache().delete_value(key)
 
 
@@ -512,7 +512,7 @@ def track_api_performance(method: str):
     return decorator
 
 
-def get_api_stats() -> Dict:
+def get_api_stats() -> dict:
     """Get API performance statistics."""
     stats = frappe.cache().hgetall("etax:api_stats") or {}
     return stats

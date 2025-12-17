@@ -18,7 +18,6 @@ Run after install:
 
 import frappe
 
-
 # Index definitions: (table, fields, name, unique)
 INDEXES = [
 	# eTax Report - Primary lookups
@@ -55,7 +54,7 @@ INDEXES = [
 		"fields": ["ent_id", "status", "period_year", "period"],
 		"name": "idx_etax_report_list"
 	},
-	
+
 	# eTax Submission Log - For audit trails
 	{
 		"table": "tabeTax Submission Log",
@@ -72,7 +71,7 @@ INDEXES = [
 		"fields": ["action", "status"],
 		"name": "idx_etax_log_action_status"
 	},
-	
+
 	# eTax Taxpayer - Organization lookups
 	{
 		"table": "tabeTax Taxpayer",
@@ -85,7 +84,7 @@ INDEXES = [
 		"fields": ["tin"],
 		"name": "idx_etax_taxpayer_tin"
 	},
-	
+
 	# eTax Report Data Item - Fast value lookups
 	{
 		"table": "tabeTax Report Data Item",
@@ -104,12 +103,12 @@ def setup_indexes():
 	"""Create all database indexes for eTax tables"""
 	created = 0
 	skipped = 0
-	
+
 	for idx in INDEXES:
 		try:
 			if create_index_safe(
-				idx["table"], 
-				idx["fields"], 
+				idx["table"],
+				idx["fields"],
 				idx["name"],
 				idx.get("unique", False)
 			):
@@ -117,8 +116,8 @@ def setup_indexes():
 			else:
 				skipped += 1
 		except Exception as e:
-			frappe.log_error(f"Index creation failed: {idx['name']}: {str(e)}", "eTax Indexes")
-	
+			frappe.log_error(f"Index creation failed: {idx['name']}: {e!s}", "eTax Indexes")
+
 	frappe.db.commit()
 	return {"created": created, "skipped": skipped}
 
@@ -127,15 +126,15 @@ def create_index_safe(table, fields, name, unique=False):
 	"""Create index if it doesn't exist"""
 	if not frappe.db.table_exists(table):
 		return False
-	
+
 	# Check if index exists
 	if index_exists(table, name):
 		return False
-	
+
 	# Create index
 	field_list = ", ".join([f"`{f}`" for f in fields])
 	unique_str = "UNIQUE " if unique else ""
-	
+
 	try:
 		frappe.db.sql(f"""
 			CREATE {unique_str}INDEX `{name}` ON `{table}` ({field_list})
@@ -148,9 +147,9 @@ def create_index_safe(table, fields, name, unique=False):
 def index_exists(table, name):
 	"""Check if index exists on table"""
 	try:
-		result = frappe.db.sql("""
+		result = frappe.db.sql(f"""
 			SHOW INDEX FROM `{table}` WHERE Key_name = %s
-		""".format(table=table), name)
+		""", name)
 		return bool(result)
 	except Exception:
 		return False
@@ -160,7 +159,7 @@ def drop_index(table, name):
 	"""Drop an index if it exists"""
 	if not index_exists(table, name):
 		return False
-	
+
 	try:
 		frappe.db.sql(f"DROP INDEX `{name}` ON `{table}`")
 		frappe.db.commit()
@@ -177,12 +176,12 @@ def analyze_tables():
 		"tabeTax Taxpayer",
 		"tabeTax Report Data Item"
 	]
-	
+
 	for table in tables:
 		if frappe.db.table_exists(table):
 			try:
 				frappe.db.sql(f"ANALYZE TABLE `{table}`")
 			except Exception:
 				pass
-	
+
 	frappe.db.commit()

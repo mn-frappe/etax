@@ -54,3 +54,17 @@ typing-modules = ["frappe.types.DF"]
 quote-style = "double"
 indent-style = "tab"
 docstring-code-format = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+ignore = [
+    "RUF001",  # Cyrillic characters (valid for Mongolian)
+    "RUF002",  # Cyrillic in docstrings
+    "RUF012",  # Mutable class defaults
+    "RUF022",  # __all__ sorting
+    "B015",    # Useless comparison
+    "F401",    # Unused imports in __init__ files
+]

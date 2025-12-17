@@ -4,4 +4,4 @@
 
 """eTax Tests Module"""
 
-from .test_etax import *
+from .test_etax import *  # noqa: F401,F403
