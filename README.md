@@ -1,9 +1,11 @@
 # eTax - Mongolian Electronic Tax Reporting System for ERPNext
 
+[![CI](https://github.com/mn-frappe/etax/actions/workflows/ci.yml/badge.svg)](https://github.com/mn-frappe/etax/actions/workflows/ci.yml)
+[![Linter](https://github.com/mn-frappe/etax/actions/workflows/linter.yml/badge.svg)](https://github.com/mn-frappe/etax/actions/workflows/linter.yml)
+![Version](https://img.shields.io/badge/Version-v1.3.0-brightgreen)
 [![Frappe](https://img.shields.io/badge/Frappe-v15-blue)](https://frappeframework.com)
 [![ERPNext](https://img.shields.io/badge/ERPNext-v15-blue)](https://erpnext.com)
-[![License](https://img.shields.io/badge/License-GPL--3.0-green)](LICENSE)
-[![Version](https://img.shields.io/badge/Version-v1.3.0-brightgreen)](https://github.com/mn-frappe/etax)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Full integration with Mongolia's eTax (etax.mta.mn) electronic tax reporting system for ERPNext v15.
 

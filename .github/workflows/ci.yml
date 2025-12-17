@@ -145,6 +145,13 @@ jobs:
         working-directory: /home/runner/frappe-bench
         run: |
           bench --site test_site set-config allow_tests true
-          bench --site test_site run-tests --app etax
+          bench --site test_site run-tests --app etax --coverage
         env:
           TYPE: server
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+          verbose: true
