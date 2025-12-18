@@ -41,6 +41,15 @@ after_migrate = ["etax.setup.install.after_migrate"]
 # Reports unhandled exceptions to GitHub Issues (if enabled in settings)
 exception_handler = "etax.etax.telemetry.on_error"
 
+# Fixtures
+# --------
+# Approval workflow fixtures
+fixtures = [
+    "etax/fixtures/etax_roles.json",
+    "etax/fixtures/etax_workflow.json",
+    "etax/fixtures/etax_notifications.json",
+]
+
 # Includes in <head>
 # ------------------
 

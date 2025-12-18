@@ -1,0 +1,74 @@
+[
+	{
+		"doctype": "Notification",
+		"name": "eTax Report Pending Review",
+		"enabled": 1,
+		"channel": "Email",
+		"document_type": "eTax Report",
+		"event": "Value Change",
+		"value_changed": "workflow_state",
+		"condition": "doc.workflow_state == 'Pending Review'",
+		"subject": "Tax Report Pending Review: {{ doc.name }}",
+		"message": "<p>Dear Reviewer,</p><p>A tax report has been submitted for your review.</p><p><strong>Report:</strong> {{ doc.name }}<br><strong>Tax Type:</strong> {{ doc.tax_type_name }}<br><strong>Period:</strong> {{ doc.period_year }} Q{{ doc.period }}<br><strong>Submitted by:</strong> {{ frappe.get_doc('User', frappe.session.user).full_name }}</p><p>Please review and take appropriate action.</p><p><a href='{{ frappe.utils.get_url_to_form(doc.doctype, doc.name) }}'>View Report</a></p>",
+		"send_to_all_assignees": 0,
+		"recipients": [
+			{
+				"receiver_by_role": "Tax Report Reviewer"
+			}
+		]
+	},
+	{
+		"doctype": "Notification",
+		"name": "eTax Report Pending Approval",
+		"enabled": 1,
+		"channel": "Email",
+		"document_type": "eTax Report",
+		"event": "Value Change",
+		"value_changed": "workflow_state",
+		"condition": "doc.workflow_state == 'Pending Approval'",
+		"subject": "Tax Report Pending CFO/CEO Approval: {{ doc.name }}",
+		"message": "<p>Dear Approver,</p><p>A tax report has been reviewed and requires your final approval before submission to MTA.</p><p><strong>Report:</strong> {{ doc.name }}<br><strong>Tax Type:</strong> {{ doc.tax_type_name }}<br><strong>Period:</strong> {{ doc.period_year }} Q{{ doc.period }}<br><strong>Reviewed by:</strong> {{ frappe.get_doc('User', frappe.session.user).full_name }}</p><p>Please review and approve for MTA submission.</p><p><a href='{{ frappe.utils.get_url_to_form(doc.doctype, doc.name) }}'>View Report</a></p>",
+		"send_to_all_assignees": 0,
+		"recipients": [
+			{
+				"receiver_by_role": "Tax Report Approver"
+			}
+		]
+	},
+	{
+		"doctype": "Notification",
+		"name": "eTax Report Approved",
+		"enabled": 1,
+		"channel": "Email",
+		"document_type": "eTax Report",
+		"event": "Value Change",
+		"value_changed": "workflow_state",
+		"condition": "doc.workflow_state == 'Approved'",
+		"subject": "Tax Report Approved: {{ doc.name }}",
+		"message": "<p>The following tax report has been approved and is ready for MTA submission.</p><p><strong>Report:</strong> {{ doc.name }}<br><strong>Tax Type:</strong> {{ doc.tax_type_name }}<br><strong>Period:</strong> {{ doc.period_year }} Q{{ doc.period }}<br><strong>Approved by:</strong> {{ frappe.get_doc('User', frappe.session.user).full_name }}</p><p><a href='{{ frappe.utils.get_url_to_form(doc.doctype, doc.name) }}'>View Report</a></p>",
+		"send_to_all_assignees": 0,
+		"recipients": [
+			{
+				"receiver_by_role": "Tax Report Preparer"
+			}
+		]
+	},
+	{
+		"doctype": "Notification",
+		"name": "eTax Report Rejected",
+		"enabled": 1,
+		"channel": "Email",
+		"document_type": "eTax Report",
+		"event": "Value Change",
+		"value_changed": "workflow_state",
+		"condition": "doc.workflow_state == 'Rejected'",
+		"subject": "Tax Report Rejected: {{ doc.name }}",
+		"message": "<p>The following tax report has been rejected and requires revision.</p><p><strong>Report:</strong> {{ doc.name }}<br><strong>Tax Type:</strong> {{ doc.tax_type_name }}<br><strong>Period:</strong> {{ doc.period_year }} Q{{ doc.period }}<br><strong>Rejected by:</strong> {{ frappe.get_doc('User', frappe.session.user).full_name }}</p><p>Please review the comments and make necessary corrections.</p><p><a href='{{ frappe.utils.get_url_to_form(doc.doctype, doc.name) }}'>View Report</a></p>",
+		"send_to_all_assignees": 0,
+		"recipients": [
+			{
+				"receiver_by_role": "Tax Report Preparer"
+			}
+		]
+	}
+]
