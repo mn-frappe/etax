@@ -588,7 +588,7 @@
 			"description": "Help improve eTax by sending anonymous error reports to GitHub Issues"
 		},
 		{
-			"default": "0",
+			"default": "1",
 			"fieldname": "enable_error_reporting",
 			"fieldtype": "Check",
 			"label": "Enable Error Reporting",
