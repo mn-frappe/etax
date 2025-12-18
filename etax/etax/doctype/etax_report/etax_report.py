@@ -79,6 +79,8 @@ class eTaxReport(Document):
     def _get_action_from_state_change(self, old_state, new_state):
         """Determine action name from state transition"""
         transitions = {
+            (None, "Draft"): "Created",
+            (None, "Pending Review"): "Created",
             ("Draft", "Pending Review"): "Submitted for Review",
             ("Pending Review", "Pending Approval"): "Reviewed",
             ("Pending Approval", "Approved"): "Approved",
@@ -88,7 +90,8 @@ class eTaxReport(Document):
             ("Approved", "Submitted to MTA"): "Submitted to MTA",
             ("Submitted to MTA", "Received"): "Received by MTA",
         }
-        return transitions.get((old_state, new_state), f"Changed to {new_state}")
+        # Return mapped action or default to "Created" for unknown transitions
+        return transitions.get((old_state, new_state), "Created")
 
     def validate_period(self):
         """Validate reporting period"""
