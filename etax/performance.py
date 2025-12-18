@@ -18,12 +18,6 @@ import frappe
 from frappe.utils import flt, get_first_day, get_last_day, getdate
 
 # Import logger utilities
-from etax.logger import (
-    log_debug,
-    log_error,
-    log_info,
-    log_scheduler_task,
-)
 
 # =============================================================================
 # Performance Indexes
