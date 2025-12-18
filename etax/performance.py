@@ -415,46 +415,9 @@ def auto_sync_tax_reports():
         frappe.log_error(f"Auto-sync tax reports failed: {e}")
 
 
-@log_scheduler_task("Auto Submit VAT Reports")
-def auto_submit_vat_reports():
-    """
-    Automatically submit VAT reports when due.
-    Called by scheduler based on autopilot settings.
-    """
-    settings = frappe.get_single("eTax Settings")
-    if not getattr(settings, "auto_fetch_reports", False):
-        log_debug("Auto submit disabled - skipping")
-        return {"status": "skipped", "reason": "auto_submit_disabled"}
-
-    # Find reports due for submission
-    due_reports = frappe.get_all(
-        "eTax Report Period",
-        filters={
-            "status": "Draft",
-            "end_date": ["<=", frappe.utils.today()]
-        },
-        fields=["name", "company", "period_name"],
-        limit=10
-    )
-
-    submitted_count = 0
-    error_count = 0
-
-    for report in due_reports:
-        try:
-            frappe.enqueue(
-                "etax.api.client.submit_report",
-                report_name=report.name,
-                queue="long",
-                timeout=600
-            )
-            log_info("Queued VAT report submission", {"report": report.name, "company": report.company, "period": report.period_name})
-            submitted_count += 1
-        except Exception as e:
-            log_error(f"Failed to queue report submission {report.name}", exc=e)
-            error_count += 1
-
-    return {"submitted": submitted_count, "errors": error_count, "total_found": len(due_reports)}
+# NOTE: Auto-submit functionality has been removed.
+# Tax reports now require manual approval workflow before submission.
+# See: eTax Report Approval workflow (Tax Report Preparer → Reviewer → Approver)
 
 
 # =============================================================================

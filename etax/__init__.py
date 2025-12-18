@@ -31,7 +31,7 @@ Integrates with General Department of Taxation (ТЕГ) for:
 
 Features (v1.3.0):
 - Comprehensive logging utilities (logger.py)
-- Autopilot mode for auto-sync and auto-submit reports
+- Multi-level approval workflow for report submissions
 - VAT data caching and pre-aggregation
 - Multi-company entity support
 - Digital signature module (signature.py)
