@@ -1,6 +1,7 @@
 [
 	{
 		"doctype": "Role",
+		"name": "Tax Report Preparer",
 		"role_name": "Tax Report Preparer",
 		"desk_access": 1,
 		"is_custom": 1,
@@ -8,6 +9,7 @@
 	},
 	{
 		"doctype": "Role",
+		"name": "Tax Report Reviewer",
 		"role_name": "Tax Report Reviewer",
 		"desk_access": 1,
 		"is_custom": 1,
@@ -15,6 +17,7 @@
 	},
 	{
 		"doctype": "Role",
+		"name": "Tax Report Approver",
 		"role_name": "Tax Report Approver",
 		"desk_access": 1,
 		"is_custom": 1,

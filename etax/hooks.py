@@ -43,8 +43,9 @@ exception_handler = "etax.etax.telemetry.on_error"
 
 # Fixtures
 # --------
-# Approval workflow fixtures
+# Approval workflow fixtures (order matters: states before workflow)
 fixtures = [
+    "etax/fixtures/etax_workflow_states.json",
     "etax/fixtures/etax_roles.json",
     "etax/fixtures/etax_workflow.json",
     "etax/fixtures/etax_notifications.json",

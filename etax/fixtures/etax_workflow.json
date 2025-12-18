@@ -1,6 +1,7 @@
 [
 	{
 		"doctype": "Workflow",
+		"name": "eTax Report Approval",
 		"workflow_name": "eTax Report Approval",
 		"document_type": "eTax Report",
 		"is_active": 1,

@@ -1,0 +1,44 @@
+[
+  {
+    "doctype": "Workflow State",
+    "name": "Draft",
+    "workflow_state_name": "Draft",
+    "style": ""
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Ready for Review",
+    "workflow_state_name": "Ready for Review",
+    "style": "Primary"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Pending Review",
+    "workflow_state_name": "Pending Review",
+    "style": "Warning"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Pending Approval",
+    "workflow_state_name": "Pending Approval",
+    "style": "Warning"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Submitted to MTA",
+    "workflow_state_name": "Submitted to MTA",
+    "style": "Info"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Confirmed",
+    "workflow_state_name": "Confirmed",
+    "style": "Success"
+  },
+  {
+    "doctype": "Workflow State",
+    "name": "Cancelled",
+    "workflow_state_name": "Cancelled",
+    "style": "Danger"
+  }
+]
