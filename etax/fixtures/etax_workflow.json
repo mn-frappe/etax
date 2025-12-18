@@ -1,0 +1,114 @@
+[
+	{
+		"doctype": "Workflow",
+		"name": "eTax Report Approval",
+		"workflow_name": "eTax Report Approval",
+		"document_type": "eTax Report",
+		"is_active": 1,
+		"override_status": 0,
+		"send_email_alert": 1,
+		"workflow_state_field": "workflow_state",
+		"states": [
+			{
+				"state": "Draft",
+				"doc_status": "0",
+				"is_optional_state": 0,
+				"allow_edit": "Tax Report Preparer"
+			},
+			{
+				"state": "Pending Review",
+				"doc_status": "0",
+				"is_optional_state": 0,
+				"allow_edit": "Tax Report Reviewer"
+			},
+			{
+				"state": "Pending Approval",
+				"doc_status": "0",
+				"is_optional_state": 0,
+				"allow_edit": "Tax Report Reviewer"
+			},
+			{
+				"state": "Approved",
+				"doc_status": "0",
+				"is_optional_state": 0,
+				"allow_edit": "Tax Report Approver"
+			},
+			{
+				"state": "Rejected",
+				"doc_status": "0",
+				"is_optional_state": 0,
+				"allow_edit": "Tax Report Preparer"
+			},
+			{
+				"state": "Submitted to MTA",
+				"doc_status": "1",
+				"is_optional_state": 0,
+				"allow_edit": "System Manager"
+			},
+			{
+				"state": "Received",
+				"doc_status": "1",
+				"is_optional_state": 0,
+				"allow_edit": "System Manager"
+			}
+		],
+		"transitions": [
+			{
+				"state": "Draft",
+				"action": "Submit for Review",
+				"next_state": "Pending Review",
+				"allowed": "Tax Report Preparer",
+				"allow_self_approval": 1
+			},
+			{
+				"state": "Pending Review",
+				"action": "Review & Recommend",
+				"next_state": "Pending Approval",
+				"allowed": "Tax Report Reviewer",
+				"allow_self_approval": 0
+			},
+			{
+				"state": "Pending Review",
+				"action": "Reject",
+				"next_state": "Rejected",
+				"allowed": "Tax Report Reviewer",
+				"allow_self_approval": 0
+			},
+			{
+				"state": "Pending Approval",
+				"action": "Approve for Submission",
+				"next_state": "Approved",
+				"allowed": "Tax Report Approver",
+				"allow_self_approval": 0
+			},
+			{
+				"state": "Pending Approval",
+				"action": "Reject",
+				"next_state": "Rejected",
+				"allowed": "Tax Report Approver",
+				"allow_self_approval": 0
+			},
+			{
+				"state": "Approved",
+				"action": "Submit to MTA",
+				"next_state": "Submitted to MTA",
+				"allowed": "Tax Report Approver",
+				"allow_self_approval": 1
+			},
+			{
+				"state": "Rejected",
+				"action": "Revise",
+				"next_state": "Draft",
+				"allowed": "Tax Report Preparer",
+				"allow_self_approval": 1
+			},
+			{
+				"state": "Submitted to MTA",
+				"action": "Mark Received",
+				"next_state": "Received",
+				"allowed": "Tax Report Approver",
+				"allow_self_approval": 1
+			}
+		]
+	}
+]

@@ -5,4 +5,4 @@ from frappe.model.document import Document
 
 
 class eTaxSubmissionLog(Document):
-	pass
+    pass

@@ -24,7 +24,7 @@ import frappe
 from frappe import _
 
 if TYPE_CHECKING:
-    from frappe.types import DF
+    pass
 
 # GitHub repository for issue creation
 GITHUB_REPO = "mn-frappe/etax"

@@ -1,676 +1,658 @@
 {
-	"actions": [],
-	"allow_rename": 0,
-	"creation": "2024-12-16 10:00:00.000000",
-	"default_view": "List",
-	"doctype": "DocType",
-	"editable_grid": 1,
-	"engine": "InnoDB",
-	"field_order": [
-		"connection_tab",
-		"environment_section",
-		"environment",
-		"column_break_env",
-		"enabled",
-		"auth_section",
-		"auth_url",
-		"username",
-		"password",
-		"column_break_auth",
-		"ne_key",
-		"org_regno",
-		"api_section",
-		"api_base_url",
-		"column_break_api",
-		"test_connection_button",
-		"connection_status",
-		"organization_section",
-		"org_name",
-		"taxpayer_tin",
-		"column_break_org",
-		"taxpayer_type",
-		"ent_id",
-		"automation_tab",
-		"autopilot_section",
-		"autopilot_enabled",
-		"auto_fill_vat_returns",
-		"column_break_autopilot",
-		"auto_submit_on_deadline",
-		"deadline_days_before",
-		"sync_section",
-		"auto_sync_reports",
-		"sync_frequency",
-		"column_break_sync",
-		"last_sync",
-		"next_sync",
-		"auto_actions_section",
-		"auto_fetch_reports",
-		"column_break_auto",
-		"notify_on_deadline",
-		"notify_email",
-		"section_erpnext_integration",
-		"enable_erpnext_vat_sync",
-		"auto_calculate_vat",
-		"column_break_erpnext_int",
-		"vat_output_account",
-		"vat_input_account",
-		"section_healthcare_integration",
-		"enable_healthcare_vat",
-		"healthcare_vat_exempt",
-		"column_break_healthcare_int",
-		"healthcare_services_account",
-		"section_education_integration",
-		"enable_education_vat",
-		"education_vat_exempt",
-		"column_break_education_int",
-		"education_fees_account",
-		"section_lending_integration",
-		"enable_lending_vat",
-		"lending_interest_vat_exempt",
-		"column_break_lending_int",
-		"lending_fees_account",
-		"advanced_tab",
-		"debug_section",
-		"debug_mode",
-		"log_api_requests",
-		"column_break_debug",
-		"log_retention_days",
-		"performance_section",
-		"timeout",
-		"retry_attempts",
-		"column_break_perf",
-		"section_telemetry",
-		"enable_error_reporting",
-		"column_break_telemetry",
-		"github_token",
-		"token_section",
-		"access_token",
-		"token_expiry",
-		"column_break_token",
-		"refresh_token"
-	],
-	"fields": [
-		{
-			"fieldname": "connection_tab",
-			"fieldtype": "Tab Break",
-			"label": "Connection"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "environment_section",
-			"fieldtype": "Section Break",
-			"label": "Environment",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "Staging",
-			"description": "Staging = Test environment (st-etax.mta.mn), Production = Live environment (etax.mta.mn)",
-			"fieldname": "environment",
-			"fieldtype": "Select",
-			"in_list_view": 1,
-			"label": "Environment",
-			"options": "Staging\nProduction",
-			"reqd": 1
-		},
-		{
-			"fieldname": "column_break_env",
-			"fieldtype": "Column Break"
-		},
-		{
-			"default": "0",
-			"description": "Enable eTax integration. If disabled, no API calls will be made.",
-			"fieldname": "enabled",
-			"fieldtype": "Check",
-			"label": "Enabled"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "auth_section",
-			"fieldtype": "Section Break",
-			"label": "Authentication (ITC OAuth2)",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "https://api.frappe.mn/auth/itc-staging",
-			"description": "ITC OAuth2 Server URL (via gateway)",
-			"fieldname": "auth_url",
-			"fieldtype": "Data",
-			"label": "Auth URL",
-			"read_only": 1
-		},
-		{
-			"description": "ITC SSO username (personal registry number)",
-			"fieldname": "username",
-			"fieldtype": "Data",
-			"in_list_view": 1,
-			"label": "Username"
-		},
-		{
-			"description": "ITC SSO password. Stored encrypted.",
-			"fieldname": "password",
-			"fieldtype": "Password",
-			"label": "Password"
-		},
-		{
-			"fieldname": "column_break_auth",
-			"fieldtype": "Column Break"
-		},
-		{
-			"description": "Special NE-KEY from request@itc.gov.mn. Required for all eTax API calls.",
-			"fieldname": "ne_key",
-			"fieldtype": "Password",
-			"label": "NE-KEY"
-		},
-		{
-			"description": "Organization registry number (company TIN)",
-			"fieldname": "org_regno",
-			"fieldtype": "Data",
-			"in_list_view": 1,
-			"label": "Organization RegNo"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "api_section",
-			"fieldtype": "Section Break",
-			"label": "API Connection",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "https://st-etax.mta.mn/api/beta",
-			"description": "Auto-set based on environment",
-			"fieldname": "api_base_url",
-			"fieldtype": "Data",
-			"label": "API URL",
-			"read_only": 1
-		},
-		{
-			"fieldname": "column_break_api",
-			"fieldtype": "Column Break"
-		},
-		{
-			"fieldname": "test_connection_button",
-			"fieldtype": "Button",
-			"label": "Test Connection"
-		},
-		{
-			"fieldname": "connection_status",
-			"fieldtype": "Data",
-			"label": "Connection Status",
-			"read_only": 1
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "organization_section",
-			"fieldtype": "Section Break",
-			"label": "Organization Info (from API)",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"description": "Organization name (auto-filled from API)",
-			"fieldname": "org_name",
-			"fieldtype": "Data",
-			"label": "Organization Name",
-			"read_only": 1
-		},
-		{
-			"description": "Taxpayer Identification Number",
-			"fieldname": "taxpayer_tin",
-			"fieldtype": "Data",
-			"label": "Taxpayer TIN",
-			"read_only": 1
-		},
-		{
-			"fieldname": "column_break_org",
-			"fieldtype": "Column Break"
-		},
-		{
-			"description": "1 = Individual, 2 = Legal Entity",
-			"fieldname": "taxpayer_type",
-			"fieldtype": "Select",
-			"label": "Taxpayer Type",
-			"options": "\n1 - Individual\n2 - Legal Entity",
-			"read_only": 1
-		},
-		{
-			"description": "Entity ID from MTA system",
-			"fieldname": "ent_id",
-			"fieldtype": "Data",
-			"label": "Entity ID",
-			"read_only": 1
-		},
-		{
-			"fieldname": "automation_tab",
-			"fieldtype": "Tab Break",
-			"label": "Automation"
-		},
-		{
-			"collapsible": 1,
-			"collapsible_depends_on": "eval:0",
-			"fieldname": "autopilot_section",
-			"fieldtype": "Section Break",
-			"label": "Autopilot"
-		},
-		{
-			"default": "0",
-			"description": "Enable fully automated VAT reporting. VAT returns will be filled and submitted automatically.",
-			"fieldname": "autopilot_enabled",
-			"fieldtype": "Check",
-			"label": "Enable Autopilot",
-			"bold": 1
-		},
-		{
-			"default": "1",
-			"depends_on": "autopilot_enabled",
-			"description": "Automatically fill VAT return data from Sales/Purchase invoices.",
-			"fieldname": "auto_fill_vat_returns",
-			"fieldtype": "Check",
-			"label": "Auto-fill VAT Returns"
-		},
-		{
-			"fieldname": "column_break_autopilot",
-			"fieldtype": "Column Break"
-		},
-		{
-			"default": "0",
-			"depends_on": "autopilot_enabled",
-			"description": "Automatically submit VAT returns before deadline.",
-			"fieldname": "auto_submit_on_deadline",
-			"fieldtype": "Check",
-			"label": "Auto-submit Before Deadline"
-		},
-		{
-			"default": "3",
-			"depends_on": "auto_submit_on_deadline",
-			"description": "Days before deadline to auto-submit.",
-			"fieldname": "deadline_days_before",
-			"fieldtype": "Int",
-			"label": "Days Before Deadline"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "sync_section",
-			"fieldtype": "Section Break",
-			"label": "Report Sync",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "0",
-			"description": "Automatically sync pending tax reports from MTA",
-			"fieldname": "auto_sync_reports",
-			"fieldtype": "Check",
-			"label": "Auto Sync Reports"
-		},
-		{
-			"default": "Daily",
-			"depends_on": "auto_sync_reports",
-			"description": "How often to check for new/updated reports",
-			"fieldname": "sync_frequency",
-			"fieldtype": "Select",
-			"label": "Sync Frequency",
-			"options": "Hourly\nDaily\nWeekly"
-		},
-		{
-			"fieldname": "column_break_sync",
-			"fieldtype": "Column Break"
-		},
-		{
-			"fieldname": "last_sync",
-			"fieldtype": "Datetime",
-			"label": "Last Sync",
-			"read_only": 1
-		},
-		{
-			"fieldname": "next_sync",
-			"fieldtype": "Datetime",
-			"label": "Next Sync",
-			"read_only": 1
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "auto_actions_section",
-			"fieldtype": "Section Break",
-			"label": "Auto Actions",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "1",
-			"description": "Automatically fetch new tax report assignments",
-			"fieldname": "auto_fetch_reports",
-			"fieldtype": "Check",
-			"label": "Auto Fetch New Reports"
-		},
-		{
-			"fieldname": "column_break_auto",
-			"fieldtype": "Column Break"
-		},
-		{
-			"default": "1",
-			"description": "Send email notification before report deadlines",
-			"fieldname": "notify_on_deadline",
-			"fieldtype": "Check",
-			"label": "Notify Before Deadline"
-		},
-		{
-			"depends_on": "notify_on_deadline",
-			"description": "Email address to receive deadline notifications",
-			"fieldname": "notify_email",
-			"fieldtype": "Data",
-			"label": "Notification Email",
-			"options": "Email"
-		},
-		{
-			"collapsible": 1,
-			"collapsible_depends_on": "eval:0",
-			"fieldname": "section_erpnext_integration",
-			"fieldtype": "Section Break",
-			"label": "ERPNext Integration",
-			"description": "VAT data integration with ERPNext invoices"
-		},
-		{
-			"default": "1",
-			"description": "Enable automatic VAT calculation from ERPNext invoices.",
-			"fieldname": "enable_erpnext_vat_sync",
-			"fieldtype": "Check",
-			"label": "Enable ERPNext VAT Sync",
-			"bold": 1
-		},
-		{
-			"default": "1",
-			"depends_on": "enable_erpnext_vat_sync",
-			"description": "Automatically calculate VAT totals from submitted invoices.",
-			"fieldname": "auto_calculate_vat",
-			"fieldtype": "Check",
-			"label": "Auto-calculate VAT"
-		},
-		{
-			"fieldname": "column_break_erpnext_int",
-			"fieldtype": "Column Break"
-		},
-		{
-			"depends_on": "enable_erpnext_vat_sync",
-			"description": "VAT Output (Sales) account for tracking.",
-			"fieldname": "vat_output_account",
-			"fieldtype": "Link",
-			"label": "VAT Output Account",
-			"options": "Account"
-		},
-		{
-			"depends_on": "enable_erpnext_vat_sync",
-			"description": "VAT Input (Purchase) account for tracking.",
-			"fieldname": "vat_input_account",
-			"fieldtype": "Link",
-			"label": "VAT Input Account",
-			"options": "Account"
-		},
-		{
-			"collapsible": 1,
-			"collapsible_depends_on": "eval:0",
-			"fieldname": "section_healthcare_integration",
-			"fieldtype": "Section Break",
-			"label": "Healthcare Integration",
-			"description": "VAT handling for healthcare services"
-		},
-		{
-			"default": "0",
-			"description": "Enable healthcare-specific VAT handling.",
-			"fieldname": "enable_healthcare_vat",
-			"fieldtype": "Check",
-			"label": "Enable Healthcare VAT",
-			"bold": 1
-		},
-		{
-			"default": "1",
-			"depends_on": "enable_healthcare_vat",
-			"description": "Mark healthcare services as VAT exempt.",
-			"fieldname": "healthcare_vat_exempt",
-			"fieldtype": "Check",
-			"label": "Healthcare VAT Exempt"
-		},
-		{
-			"fieldname": "column_break_healthcare_int",
-			"fieldtype": "Column Break"
-		},
-		{
-			"depends_on": "enable_healthcare_vat",
-			"description": "Account for healthcare services revenue.",
-			"fieldname": "healthcare_services_account",
-			"fieldtype": "Link",
-			"label": "Healthcare Services Account",
-			"options": "Account"
-		},
-		{
-			"collapsible": 1,
-			"collapsible_depends_on": "eval:0",
-			"fieldname": "section_education_integration",
-			"fieldtype": "Section Break",
-			"label": "Education Integration",
-			"description": "VAT handling for education services"
-		},
-		{
-			"default": "0",
-			"description": "Enable education-specific VAT handling.",
-			"fieldname": "enable_education_vat",
-			"fieldtype": "Check",
-			"label": "Enable Education VAT",
-			"bold": 1
-		},
-		{
-			"default": "1",
-			"depends_on": "enable_education_vat",
-			"description": "Mark education fees as VAT exempt.",
-			"fieldname": "education_vat_exempt",
-			"fieldtype": "Check",
-			"label": "Education VAT Exempt"
-		},
-		{
-			"fieldname": "column_break_education_int",
-			"fieldtype": "Column Break"
-		},
-		{
-			"depends_on": "enable_education_vat",
-			"description": "Account for education fee revenue.",
-			"fieldname": "education_fees_account",
-			"fieldtype": "Link",
-			"label": "Education Fees Account",
-			"options": "Account"
-		},
-		{
-			"collapsible": 1,
-			"collapsible_depends_on": "eval:0",
-			"fieldname": "section_lending_integration",
-			"fieldtype": "Section Break",
-			"label": "Lending Integration",
-			"description": "VAT handling for lending services"
-		},
-		{
-			"default": "0",
-			"description": "Enable lending-specific VAT handling.",
-			"fieldname": "enable_lending_vat",
-			"fieldtype": "Check",
-			"label": "Enable Lending VAT",
-			"bold": 1
-		},
-		{
-			"default": "1",
-			"depends_on": "enable_lending_vat",
-			"description": "Mark loan interest as VAT exempt.",
-			"fieldname": "lending_interest_vat_exempt",
-			"fieldtype": "Check",
-			"label": "Interest VAT Exempt"
-		},
-		{
-			"fieldname": "column_break_lending_int",
-			"fieldtype": "Column Break"
-		},
-		{
-			"depends_on": "enable_lending_vat",
-			"description": "Account for lending fees/commissions.",
-			"fieldname": "lending_fees_account",
-			"fieldtype": "Link",
-			"label": "Lending Fees Account",
-			"options": "Account"
-		},
-		{
-			"fieldname": "advanced_tab",
-			"fieldtype": "Tab Break",
-			"label": "Advanced"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "debug_section",
-			"fieldtype": "Section Break",
-			"label": "Debug & Logging",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "0",
-			"description": "Enable debug mode for troubleshooting",
-			"fieldname": "debug_mode",
-			"fieldtype": "Check",
-			"label": "Debug Mode"
-		},
-		{
-			"default": "0",
-			"description": "Log all API requests and responses",
-			"fieldname": "log_api_requests",
-			"fieldtype": "Check",
-			"label": "Log API Requests"
-		},
-		{
-			"fieldname": "column_break_debug",
-			"fieldtype": "Column Break"
-		},
-		{
-			"default": "30",
-			"description": "Days to keep API logs before cleanup",
-			"fieldname": "log_retention_days",
-			"fieldtype": "Int",
-			"label": "Log Retention (days)"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "performance_section",
-			"fieldtype": "Section Break",
-			"label": "Performance",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"default": "30",
-			"description": "API request timeout in seconds",
-			"fieldname": "timeout",
-			"fieldtype": "Int",
-			"label": "Timeout (seconds)"
-		},
-		{
-			"default": "3",
-			"description": "Number of retry attempts for failed requests",
-			"fieldname": "retry_attempts",
-			"fieldtype": "Int",
-			"label": "Retry Attempts"
-		},
-		{
-			"fieldname": "column_break_perf",
-			"fieldtype": "Column Break"
-		},
-		{
-			"collapsible": 1,
-			"fieldname": "section_telemetry",
-			"fieldtype": "Section Break",
-			"label": "Error Reporting (Telemetry)",
-			"description": "Help improve eTax by sending anonymous error reports to GitHub Issues"
-		},
-		{
-			"default": "0",
-			"fieldname": "enable_error_reporting",
-			"fieldtype": "Check",
-			"label": "Enable Error Reporting",
-			"description": "Send anonymous error reports to mn-frappe/etax GitHub repository"
-		},
-		{
-			"fieldname": "column_break_telemetry",
-			"fieldtype": "Column Break"
-		},
-		{
-			"fieldname": "github_token",
-			"fieldtype": "Password",
-			"label": "GitHub Token (Optional)",
-			"description": "Personal access token with 'repo' scope for issue creation",
-			"depends_on": "enable_error_reporting"
-		},
-		{
-			"collapsible": 1,
-			"collapsed": 1,
-			"fieldname": "token_section",
-			"fieldtype": "Section Break",
-			"label": "Token Status",
-			"collapsible_depends_on": "eval:0"
-		},
-		{
-			"description": "Current OAuth2 access token (auto-managed)",
-			"fieldname": "access_token",
-			"fieldtype": "Password",
-			"hidden": 1,
-			"label": "Access Token"
-		},
-		{
-			"fieldname": "token_expiry",
-			"fieldtype": "Datetime",
-			"label": "Token Expiry",
-			"read_only": 1
-		},
-		{
-			"fieldname": "column_break_token",
-			"fieldtype": "Column Break"
-		},
-		{
-			"fieldname": "refresh_token",
-			"fieldtype": "Password",
-			"hidden": 1,
-			"label": "Refresh Token"
-		}
-	],
-	"hide_toolbar": 0,
-	"index_web_pages_for_search": 1,
-	"issingle": 1,
-	"links": [],
-	"modified": "2024-12-16 20:00:00.000000",
-	"modified_by": "Administrator",
-	"module": "eTax",
-	"name": "eTax Settings",
-	"naming_rule": "Expression (old style)",
-	"owner": "Administrator",
-	"permissions": [
-		{
-			"create": 1,
-			"delete": 1,
-			"email": 1,
-			"print": 1,
-			"read": 1,
-			"role": "System Manager",
-			"share": 1,
-			"write": 1
-		},
-		{
-			"create": 1,
-			"delete": 1,
-			"email": 1,
-			"print": 1,
-			"read": 1,
-			"role": "Accounts Manager",
-			"share": 1,
-			"write": 1
-		}
-	],
-	"sort_field": "creation",
-	"sort_order": "DESC",
-	"states": [],
-	"track_changes": 1
+ "actions": [],
+ "allow_rename": 0,
+ "creation": "2024-12-16 10:00:00.000000",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "connection_tab",
+  "environment_section",
+  "environment",
+  "column_break_env",
+  "enabled",
+  "auth_section",
+  "auth_url",
+  "username",
+  "password",
+  "column_break_auth",
+  "ne_key",
+  "org_regno",
+  "api_section",
+  "api_base_url",
+  "column_break_api",
+  "test_connection_button",
+  "connection_status",
+  "organization_section",
+  "org_name",
+  "taxpayer_tin",
+  "column_break_org",
+  "taxpayer_type",
+  "ent_id",
+  "automation_tab",
+  "autopilot_section",
+  "autopilot_enabled",
+  "auto_fill_vat_returns",
+  "column_break_autopilot",
+  "sync_section",
+  "auto_sync_reports",
+  "sync_frequency",
+  "column_break_sync",
+  "last_sync",
+  "next_sync",
+  "auto_actions_section",
+  "auto_fetch_reports",
+  "column_break_auto",
+  "notify_on_deadline",
+  "notify_email",
+  "section_erpnext_integration",
+  "enable_erpnext_vat_sync",
+  "auto_calculate_vat",
+  "column_break_erpnext_int",
+  "vat_output_account",
+  "vat_input_account",
+  "section_healthcare_integration",
+  "enable_healthcare_vat",
+  "healthcare_vat_exempt",
+  "column_break_healthcare_int",
+  "healthcare_services_account",
+  "section_education_integration",
+  "enable_education_vat",
+  "education_vat_exempt",
+  "column_break_education_int",
+  "education_fees_account",
+  "section_lending_integration",
+  "enable_lending_vat",
+  "lending_interest_vat_exempt",
+  "column_break_lending_int",
+  "lending_fees_account",
+  "advanced_tab",
+  "debug_section",
+  "debug_mode",
+  "log_api_requests",
+  "column_break_debug",
+  "log_retention_days",
+  "performance_section",
+  "timeout",
+  "retry_attempts",
+  "column_break_perf",
+  "section_telemetry",
+  "enable_error_reporting",
+  "column_break_telemetry",
+  "github_token",
+  "token_section",
+  "access_token",
+  "token_expiry",
+  "column_break_token",
+  "refresh_token"
+ ],
+ "fields": [
+  {
+   "fieldname": "connection_tab",
+   "fieldtype": "Tab Break",
+   "label": "Connection"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "environment_section",
+   "fieldtype": "Section Break",
+   "label": "Environment",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "Staging",
+   "description": "Staging = Test environment (st-etax.mta.mn), Production = Live environment (etax.mta.mn)",
+   "fieldname": "environment",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Environment",
+   "options": "Staging\nProduction",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_env",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "Enable eTax integration. If disabled, no API calls will be made.",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "auth_section",
+   "fieldtype": "Section Break",
+   "label": "Authentication (ITC OAuth2)",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "https://api.frappe.mn/auth/itc-staging",
+   "description": "ITC OAuth2 Server URL (via gateway)",
+   "fieldname": "auth_url",
+   "fieldtype": "Data",
+   "label": "Auth URL",
+   "read_only": 1
+  },
+  {
+   "description": "ITC SSO username (personal registry number)",
+   "fieldname": "username",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Username"
+  },
+  {
+   "description": "ITC SSO password. Stored encrypted.",
+   "fieldname": "password",
+   "fieldtype": "Password",
+   "label": "Password"
+  },
+  {
+   "fieldname": "column_break_auth",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Special NE-KEY from request@itc.gov.mn. Required for all eTax API calls.",
+   "fieldname": "ne_key",
+   "fieldtype": "Password",
+   "label": "NE-KEY"
+  },
+  {
+   "description": "Organization registry number (company TIN)",
+   "fieldname": "org_regno",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Organization RegNo"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "api_section",
+   "fieldtype": "Section Break",
+   "label": "API Connection",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "https://st-etax.mta.mn/api/beta",
+   "description": "Auto-set based on environment",
+   "fieldname": "api_base_url",
+   "fieldtype": "Data",
+   "label": "API URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_api",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "test_connection_button",
+   "fieldtype": "Button",
+   "label": "Test Connection"
+  },
+  {
+   "fieldname": "connection_status",
+   "fieldtype": "Data",
+   "label": "Connection Status",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "organization_section",
+   "fieldtype": "Section Break",
+   "label": "Organization Info (from API)",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "description": "Organization name (auto-filled from API)",
+   "fieldname": "org_name",
+   "fieldtype": "Data",
+   "label": "Organization Name",
+   "read_only": 1
+  },
+  {
+   "description": "Taxpayer Identification Number",
+   "fieldname": "taxpayer_tin",
+   "fieldtype": "Data",
+   "label": "Taxpayer TIN",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_org",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "1 = Individual, 2 = Legal Entity",
+   "fieldname": "taxpayer_type",
+   "fieldtype": "Select",
+   "label": "Taxpayer Type",
+   "options": "\n1 - Individual\n2 - Legal Entity",
+   "read_only": 1
+  },
+  {
+   "description": "Entity ID from MTA system",
+   "fieldname": "ent_id",
+   "fieldtype": "Data",
+   "label": "Entity ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "automation_tab",
+   "fieldtype": "Tab Break",
+   "label": "Automation"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:0",
+   "fieldname": "autopilot_section",
+   "fieldtype": "Section Break",
+   "label": "Autopilot"
+  },
+  {
+   "default": "0",
+   "description": "Enable fully automated VAT reporting. VAT returns will be filled and submitted automatically.",
+   "fieldname": "autopilot_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Autopilot",
+   "bold": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "autopilot_enabled",
+   "description": "Automatically fill VAT return data from Sales/Purchase invoices.",
+   "fieldname": "auto_fill_vat_returns",
+   "fieldtype": "Check",
+   "label": "Auto-fill VAT Returns"
+  },
+  {
+   "fieldname": "column_break_autopilot",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "sync_section",
+   "fieldtype": "Section Break",
+   "label": "Report Sync",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "0",
+   "description": "Automatically sync pending tax reports from MTA",
+   "fieldname": "auto_sync_reports",
+   "fieldtype": "Check",
+   "label": "Auto Sync Reports"
+  },
+  {
+   "default": "Daily",
+   "depends_on": "auto_sync_reports",
+   "description": "How often to check for new/updated reports",
+   "fieldname": "sync_frequency",
+   "fieldtype": "Select",
+   "label": "Sync Frequency",
+   "options": "Hourly\nDaily\nWeekly"
+  },
+  {
+   "fieldname": "column_break_sync",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "last_sync",
+   "fieldtype": "Datetime",
+   "label": "Last Sync",
+   "read_only": 1
+  },
+  {
+   "fieldname": "next_sync",
+   "fieldtype": "Datetime",
+   "label": "Next Sync",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "auto_actions_section",
+   "fieldtype": "Section Break",
+   "label": "Auto Actions",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "1",
+   "description": "Automatically fetch new tax report assignments",
+   "fieldname": "auto_fetch_reports",
+   "fieldtype": "Check",
+   "label": "Auto Fetch New Reports"
+  },
+  {
+   "fieldname": "column_break_auto",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "description": "Send email notification before report deadlines",
+   "fieldname": "notify_on_deadline",
+   "fieldtype": "Check",
+   "label": "Notify Before Deadline"
+  },
+  {
+   "depends_on": "notify_on_deadline",
+   "description": "Email address to receive deadline notifications",
+   "fieldname": "notify_email",
+   "fieldtype": "Data",
+   "label": "Notification Email",
+   "options": "Email"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:0",
+   "fieldname": "section_erpnext_integration",
+   "fieldtype": "Section Break",
+   "label": "ERPNext Integration",
+   "description": "VAT data integration with ERPNext invoices"
+  },
+  {
+   "default": "1",
+   "description": "Enable automatic VAT calculation from ERPNext invoices.",
+   "fieldname": "enable_erpnext_vat_sync",
+   "fieldtype": "Check",
+   "label": "Enable ERPNext VAT Sync",
+   "bold": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "enable_erpnext_vat_sync",
+   "description": "Automatically calculate VAT totals from submitted invoices.",
+   "fieldname": "auto_calculate_vat",
+   "fieldtype": "Check",
+   "label": "Auto-calculate VAT"
+  },
+  {
+   "fieldname": "column_break_erpnext_int",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "enable_erpnext_vat_sync",
+   "description": "VAT Output (Sales) account for tracking.",
+   "fieldname": "vat_output_account",
+   "fieldtype": "Link",
+   "label": "VAT Output Account",
+   "options": "Account"
+  },
+  {
+   "depends_on": "enable_erpnext_vat_sync",
+   "description": "VAT Input (Purchase) account for tracking.",
+   "fieldname": "vat_input_account",
+   "fieldtype": "Link",
+   "label": "VAT Input Account",
+   "options": "Account"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:0",
+   "fieldname": "section_healthcare_integration",
+   "fieldtype": "Section Break",
+   "label": "Healthcare Integration",
+   "description": "VAT handling for healthcare services"
+  },
+  {
+   "default": "0",
+   "description": "Enable healthcare-specific VAT handling.",
+   "fieldname": "enable_healthcare_vat",
+   "fieldtype": "Check",
+   "label": "Enable Healthcare VAT",
+   "bold": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "enable_healthcare_vat",
+   "description": "Mark healthcare services as VAT exempt.",
+   "fieldname": "healthcare_vat_exempt",
+   "fieldtype": "Check",
+   "label": "Healthcare VAT Exempt"
+  },
+  {
+   "fieldname": "column_break_healthcare_int",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "enable_healthcare_vat",
+   "description": "Account for healthcare services revenue.",
+   "fieldname": "healthcare_services_account",
+   "fieldtype": "Link",
+   "label": "Healthcare Services Account",
+   "options": "Account"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:0",
+   "fieldname": "section_education_integration",
+   "fieldtype": "Section Break",
+   "label": "Education Integration",
+   "description": "VAT handling for education services"
+  },
+  {
+   "default": "0",
+   "description": "Enable education-specific VAT handling.",
+   "fieldname": "enable_education_vat",
+   "fieldtype": "Check",
+   "label": "Enable Education VAT",
+   "bold": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "enable_education_vat",
+   "description": "Mark education fees as VAT exempt.",
+   "fieldname": "education_vat_exempt",
+   "fieldtype": "Check",
+   "label": "Education VAT Exempt"
+  },
+  {
+   "fieldname": "column_break_education_int",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "enable_education_vat",
+   "description": "Account for education fee revenue.",
+   "fieldname": "education_fees_account",
+   "fieldtype": "Link",
+   "label": "Education Fees Account",
+   "options": "Account"
+  },
+  {
+   "collapsible": 1,
+   "collapsible_depends_on": "eval:0",
+   "fieldname": "section_lending_integration",
+   "fieldtype": "Section Break",
+   "label": "Lending Integration",
+   "description": "VAT handling for lending services"
+  },
+  {
+   "default": "0",
+   "description": "Enable lending-specific VAT handling.",
+   "fieldname": "enable_lending_vat",
+   "fieldtype": "Check",
+   "label": "Enable Lending VAT",
+   "bold": 1
+  },
+  {
+   "default": "1",
+   "depends_on": "enable_lending_vat",
+   "description": "Mark loan interest as VAT exempt.",
+   "fieldname": "lending_interest_vat_exempt",
+   "fieldtype": "Check",
+   "label": "Interest VAT Exempt"
+  },
+  {
+   "fieldname": "column_break_lending_int",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "enable_lending_vat",
+   "description": "Account for lending fees/commissions.",
+   "fieldname": "lending_fees_account",
+   "fieldtype": "Link",
+   "label": "Lending Fees Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "advanced_tab",
+   "fieldtype": "Tab Break",
+   "label": "Advanced"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "debug_section",
+   "fieldtype": "Section Break",
+   "label": "Debug & Logging",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "0",
+   "description": "Enable debug mode for troubleshooting",
+   "fieldname": "debug_mode",
+   "fieldtype": "Check",
+   "label": "Debug Mode"
+  },
+  {
+   "default": "0",
+   "description": "Log all API requests and responses",
+   "fieldname": "log_api_requests",
+   "fieldtype": "Check",
+   "label": "Log API Requests"
+  },
+  {
+   "fieldname": "column_break_debug",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "30",
+   "description": "Days to keep API logs before cleanup",
+   "fieldname": "log_retention_days",
+   "fieldtype": "Int",
+   "label": "Log Retention (days)"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "performance_section",
+   "fieldtype": "Section Break",
+   "label": "Performance",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "default": "30",
+   "description": "API request timeout in seconds",
+   "fieldname": "timeout",
+   "fieldtype": "Int",
+   "label": "Timeout (seconds)"
+  },
+  {
+   "default": "3",
+   "description": "Number of retry attempts for failed requests",
+   "fieldname": "retry_attempts",
+   "fieldtype": "Int",
+   "label": "Retry Attempts"
+  },
+  {
+   "fieldname": "column_break_perf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "section_telemetry",
+   "fieldtype": "Section Break",
+   "label": "Error Reporting (Telemetry)",
+   "description": "Help improve eTax by sending anonymous error reports to GitHub Issues"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_error_reporting",
+   "fieldtype": "Check",
+   "label": "Enable Error Reporting",
+   "description": "Send anonymous error reports to mn-frappe/etax GitHub repository"
+  },
+  {
+   "fieldname": "column_break_telemetry",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "github_token",
+   "fieldtype": "Password",
+   "label": "GitHub Token (Optional)",
+   "description": "Personal access token with 'repo' scope for issue creation",
+   "depends_on": "enable_error_reporting"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "token_section",
+   "fieldtype": "Section Break",
+   "label": "Token Status",
+   "collapsible_depends_on": "eval:0"
+  },
+  {
+   "description": "Current OAuth2 access token (auto-managed)",
+   "fieldname": "access_token",
+   "fieldtype": "Password",
+   "hidden": 1,
+   "label": "Access Token"
+  },
+  {
+   "fieldname": "token_expiry",
+   "fieldtype": "Datetime",
+   "label": "Token Expiry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_token",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "refresh_token",
+   "fieldtype": "Password",
+   "hidden": 1,
+   "label": "Refresh Token"
+  }
+ ],
+ "hide_toolbar": 0,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-12-16 20:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "eTax",
+ "name": "eTax Settings",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
 }

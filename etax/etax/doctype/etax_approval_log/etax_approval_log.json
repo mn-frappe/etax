@@ -1,0 +1,134 @@
+{
+	"actions": [],
+	"autoname": "format:ETAX-APPR-{####}",
+	"creation": "2024-12-18 10:00:00.000000",
+	"doctype": "DocType",
+	"engine": "InnoDB",
+	"field_order": [
+		"report",
+		"action",
+		"column_break_1",
+		"action_date",
+		"action_by",
+		"details_section",
+		"from_status",
+		"to_status",
+		"column_break_2",
+		"role",
+		"comments_section",
+		"comments"
+	],
+	"fields": [
+		{
+			"fieldname": "report",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Tax Report",
+			"options": "eTax Report",
+			"reqd": 1
+		},
+		{
+			"fieldname": "action",
+			"fieldtype": "Select",
+			"in_list_view": 1,
+			"in_standard_filter": 1,
+			"label": "Action",
+			"options": "Created\nSubmitted for Review\nReviewed\nApproved\nRejected\nSubmitted to MTA\nReceived by MTA\nReturned by MTA",
+			"reqd": 1
+		},
+		{
+			"fieldname": "column_break_1",
+			"fieldtype": "Column Break"
+		},
+		{
+			"default": "now",
+			"fieldname": "action_date",
+			"fieldtype": "Datetime",
+			"in_list_view": 1,
+			"label": "Action Date",
+			"read_only": 1
+		},
+		{
+			"fieldname": "action_by",
+			"fieldtype": "Link",
+			"in_list_view": 1,
+			"label": "Action By",
+			"options": "User",
+			"read_only": 1
+		},
+		{
+			"fieldname": "details_section",
+			"fieldtype": "Section Break",
+			"label": "Status Change"
+		},
+		{
+			"fieldname": "from_status",
+			"fieldtype": "Data",
+			"label": "From Status",
+			"read_only": 1
+		},
+		{
+			"fieldname": "to_status",
+			"fieldtype": "Data",
+			"label": "To Status",
+			"read_only": 1
+		},
+		{
+			"fieldname": "column_break_2",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "role",
+			"fieldtype": "Data",
+			"label": "Role",
+			"read_only": 1
+		},
+		{
+			"fieldname": "comments_section",
+			"fieldtype": "Section Break",
+			"label": "Comments"
+		},
+		{
+			"fieldname": "comments",
+			"fieldtype": "Text",
+			"label": "Comments"
+		}
+	],
+	"index_web_pages_for_search": 1,
+	"links": [],
+	"modified": "2024-12-18 10:00:00.000000",
+	"modified_by": "Administrator",
+	"module": "eTax",
+	"name": "eTax Approval Log",
+	"naming_rule": "Expression (old style)",
+	"owner": "Administrator",
+	"permissions": [
+		{
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "System Manager",
+			"share": 1
+		},
+		{
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Accounts Manager",
+			"share": 1
+		},
+		{
+			"read": 1,
+			"role": "Accounts User"
+		}
+	],
+	"sort_field": "creation",
+	"sort_order": "DESC",
+	"states": [],
+	"track_changes": 0
+}

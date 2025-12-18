@@ -15,6 +15,7 @@
 		"column_break_info",
 		"status",
 		"status_code",
+		"workflow_state",
 		"is_x_report",
 		"tax_type_section",
 		"tax_type_id",
@@ -42,6 +43,13 @@
 		"ent_name",
 		"column_break_tp",
 		"pin",
+		"approval_section",
+		"reviewed_by",
+		"reviewed_date",
+		"column_break_approval",
+		"approved_by",
+		"approved_date",
+		"approval_comments",
 		"submission_section",
 		"submitted_date",
 		"received_date",
@@ -101,6 +109,16 @@
 			"fieldtype": "Int",
 			"hidden": 1,
 			"label": "Status Code"
+		},
+		{
+			"allow_on_submit": 0,
+			"fieldname": "workflow_state",
+			"fieldtype": "Link",
+			"hidden": 1,
+			"label": "Workflow State",
+			"no_copy": 1,
+			"options": "Workflow State",
+			"read_only": 1
 		},
 		{
 			"default": "0",
@@ -255,6 +273,47 @@
 			"label": "Registry No (PIN)"
 		},
 		{
+			"collapsible": 0,
+			"fieldname": "approval_section",
+			"fieldtype": "Section Break",
+			"label": "Approval Information"
+		},
+		{
+			"fieldname": "reviewed_by",
+			"fieldtype": "Link",
+			"label": "Reviewed By",
+			"options": "User",
+			"read_only": 1
+		},
+		{
+			"fieldname": "reviewed_date",
+			"fieldtype": "Datetime",
+			"label": "Reviewed Date",
+			"read_only": 1
+		},
+		{
+			"fieldname": "column_break_approval",
+			"fieldtype": "Column Break"
+		},
+		{
+			"fieldname": "approved_by",
+			"fieldtype": "Link",
+			"label": "Approved By",
+			"options": "User",
+			"read_only": 1
+		},
+		{
+			"fieldname": "approved_date",
+			"fieldtype": "Datetime",
+			"label": "Approved Date",
+			"read_only": 1
+		},
+		{
+			"fieldname": "approval_comments",
+			"fieldtype": "Small Text",
+			"label": "Approval Comments"
+		},
+		{
 			"collapsible": 1,
 			"fieldname": "submission_section",
 			"fieldtype": "Section Break",
@@ -335,6 +394,44 @@
 			"role": "System Manager",
 			"share": 1,
 			"submit": 1,
+			"write": 1
+		},
+		{
+			"amend": 1,
+			"cancel": 1,
+			"create": 1,
+			"delete": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Tax Report Approver",
+			"share": 1,
+			"submit": 1,
+			"write": 1
+		},
+		{
+			"amend": 1,
+			"create": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Tax Report Reviewer",
+			"share": 1,
+			"write": 1
+		},
+		{
+			"create": 1,
+			"email": 1,
+			"export": 1,
+			"print": 1,
+			"read": 1,
+			"report": 1,
+			"role": "Tax Report Preparer",
+			"share": 1,
 			"write": 1
 		},
 		{

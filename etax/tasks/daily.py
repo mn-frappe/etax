@@ -12,33 +12,33 @@ import frappe
 
 
 def sync_reports_daily():
-	"""
-	Daily task to sync tax reports from MTA.
+    """
+    Daily task to sync tax reports from MTA.
 
-	Only runs if:
-	- eTax is enabled
-	- Auto sync is enabled
-	- Sync frequency is Daily
-	"""
-	try:
-		settings = frappe.get_single("eTax Settings")
+    Only runs if:
+    - eTax is enabled
+    - Auto sync is enabled
+    - Sync frequency is Daily
+    """
+    try:
+        settings = frappe.get_single("eTax Settings")
 
-		if not settings.enabled:
-			return
+        if not settings.enabled:
+            return
 
-		if not settings.auto_sync_reports:
-			return
+        if not settings.auto_sync_reports:
+            return
 
-		if settings.sync_frequency != "Daily":
-			return
+        if settings.sync_frequency != "Daily":
+            return
 
-		# Run sync
-		result = settings.sync_reports()
+        # Run sync
+        result = settings.sync_reports()
 
-		if result.get("success"):
-			frappe.logger().info(f"eTax daily sync: {result.get('count', 0)} reports synced")
-		else:
-			frappe.logger().error(f"eTax daily sync failed: {result.get('message')}")
+        if result.get("success"):
+            frappe.logger().info(f"eTax daily sync: {result.get('count', 0)} reports synced")
+        else:
+            frappe.logger().error(f"eTax daily sync failed: {result.get('message')}")
 
-	except Exception as e:
-		frappe.log_error(f"eTax daily sync error: {e!s}", "eTax Scheduler")
+    except Exception as e:
+        frappe.log_error(f"eTax daily sync error: {e!s}", "eTax Scheduler")
