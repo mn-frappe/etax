@@ -26,7 +26,7 @@ app_description = (
 )
 app_email = "dev@frappe.mn"
 app_license = "gpl-3.0"
-app_version = "1.1.0"
+app_version = "1.3.0"
 
 # Required Apps - ERPNext required for accounting data
 required_apps = ["frappe", "erpnext"]
@@ -111,9 +111,7 @@ fixtures = [
 
 # Installation
 # ------------
-
-before_install = "etax.setup.install.before_uninstall"
-after_install = "etax.setup.install.after_install"
+# (Defined at top of file)
 
 # Uninstallation
 # ------------
