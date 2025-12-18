@@ -10,6 +10,7 @@ Provides audit trail for compliance and accountability.
 """
 
 import frappe
+from frappe import utils
 from frappe.model.document import Document
 
 
@@ -22,7 +23,7 @@ class eTaxApprovalLog(Document):
 			self.action_by = frappe.session.user
 
 		if not self.action_date:
-			self.action_date = frappe.utils.now_datetime()
+			self.action_date = utils.now_datetime()
 
 		# Get user's role
 		if not self.role:
