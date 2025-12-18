@@ -67,6 +67,6 @@ def create_approval_log(report, action, from_status=None, to_status=None, commen
         "to_status": to_status,
         "comments": comments
     })
-    log.insert(ignore_permissions=True)
-    frappe.db.commit()
+    # Use ignore_links=True because the document may not be fully committed yet
+    log.insert(ignore_permissions=True, ignore_links=True)
     return log
