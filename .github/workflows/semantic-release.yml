@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - main
+      - develop
 
 permissions:
   contents: write
@@ -42,7 +43,7 @@ jobs:
         run: |
           cat > .releaserc.json << 'EOF'
           {
-            "branches": ["master", "main"],
+            "branches": ["master", "main", "develop"],
             "plugins": [
               ["@semantic-release/commit-analyzer", {
                 "preset": "conventionalcommits",
