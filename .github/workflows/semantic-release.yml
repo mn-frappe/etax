@@ -43,7 +43,11 @@ jobs:
         run: |
           cat > .releaserc.json << 'EOF'
           {
-            "branches": ["master", "main", "develop"],
+            "branches": [
+              "master",
+              "main",
+              {"name": "develop", "prerelease": false}
+            ],
             "plugins": [
               ["@semantic-release/commit-analyzer", {
                 "preset": "conventionalcommits",
