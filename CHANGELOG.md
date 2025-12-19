@@ -1,3 +1,9 @@
+## [1.5.0](https://github.com/mn-frappe/etax/compare/v1.4.0...v1.5.0) (2025-12-19)
+
+### 🚀 Features
+
+* Add ERPNext VAT integration hooks and eTax Invoice Link doctype ([#8](https://github.com/mn-frappe/etax/issues/8)) ([8ff6370](https://github.com/mn-frappe/etax/commit/8ff6370a1af602b29c3811d73da880f4b3ee40d1))
+
 ## [1.4.0](https://github.com/mn-frappe/etax/compare/v1.3.0...v1.4.0) (2025-12-17)
 
 ### 🚀 Features

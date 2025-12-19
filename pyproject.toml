@@ -1,6 +1,6 @@
 [project]
 name = "etax"
-version = "1.4.0"
+version = "1.5.0"
 authors = [
     { name = "Digital Consulting Service LLC (Mongolia)", email = "dev@frappe.mn" }
 ]
