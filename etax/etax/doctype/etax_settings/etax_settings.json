@@ -19,6 +19,12 @@
   "column_break_auth",
   "ne_key",
   "org_regno",
+  "certificate_section",
+  "certificate_file",
+  "certificate_password",
+  "column_break_cert",
+  "certificate_expiry",
+  "cert_expiry_alert_days",
   "api_section",
   "api_base_url",
   "column_break_api",
@@ -167,6 +173,45 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Organization RegNo"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
+   "fieldname": "certificate_section",
+   "fieldtype": "Section Break",
+   "label": "Digital Certificate",
+   "collapsible_depends_on": "eval:0",
+   "description": "Digital certificate for eTax signing (required for report submission)"
+  },
+  {
+   "fieldname": "certificate_file",
+   "fieldtype": "Attach",
+   "label": "Certificate File (.p12/.pfx)",
+   "description": "Upload your digital signing certificate in PKCS#12 format"
+  },
+  {
+   "fieldname": "certificate_password",
+   "fieldtype": "Password",
+   "label": "Certificate Password",
+   "description": "Password to unlock the certificate file"
+  },
+  {
+   "fieldname": "column_break_cert",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "certificate_expiry",
+   "fieldtype": "Date",
+   "label": "Certificate Expiry",
+   "read_only": 1,
+   "description": "Certificate expiration date (auto-detected from certificate)"
+  },
+  {
+   "default": "30",
+   "fieldname": "cert_expiry_alert_days",
+   "fieldtype": "Int",
+   "label": "Alert Days Before Expiry",
+   "description": "Send email alert this many days before certificate expires"
   },
   {
    "collapsible": 1,

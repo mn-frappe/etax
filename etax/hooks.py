@@ -202,6 +202,7 @@ scheduler_events = {
     ],
     "daily": [
         "etax.tasks.daily.sync_reports_daily",
+        "etax.tasks.certificate.check_certificate_expiry",
     ],
     "weekly": [
         "etax.performance.ensure_indexes",
