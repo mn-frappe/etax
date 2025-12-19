@@ -166,13 +166,28 @@ fixtures = [
 # Hook on document methods and events
 
 doc_events = {
+    # eTax internal events
     "eTax Settings": {
         "on_update": "etax.api.cache.on_settings_update"
     },
     "eTax Report": {
         "after_insert": "etax.api.cache.on_report_sync",
         "on_update": "etax.api.cache.on_report_sync"
-    }
+    },
+    # ERPNext Integration - Auto-capture VAT data
+    # These hooks create eTax Invoice Link records for tax reporting
+    "Sales Invoice": {
+        "on_submit": "etax.integrations.sales_invoice.on_submit",
+        "on_cancel": "etax.integrations.sales_invoice.on_cancel",
+    },
+    "Purchase Invoice": {
+        "on_submit": "etax.integrations.purchase_invoice.on_submit",
+        "on_cancel": "etax.integrations.purchase_invoice.on_cancel",
+    },
+    "Journal Entry": {
+        "on_submit": "etax.integrations.journal_entry.on_submit",
+        "on_cancel": "etax.integrations.journal_entry.on_cancel",
+    },
 }
 
 # Scheduled Tasks
