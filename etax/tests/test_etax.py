@@ -174,11 +174,14 @@ class TestETaxAuth(FrappeTestCase):
         self.assertIn("Staging", ETaxAuth.GATEWAY_PATHS)
         self.assertIn("Production", ETaxAuth.GATEWAY_PATHS)
 
-    def test_client_id_defined(self):
-        """Client ID should be vatps (unified ITC client)"""
+    def test_client_ids_defined(self):
+        """Client IDs should be defined for each environment"""
         from etax.api.auth import ETaxAuth
 
-        self.assertEqual(ETaxAuth.CLIENT_ID, "vatps")
+        # CLIENT_IDS is a dict with environment keys
+        self.assertIn("Staging", ETaxAuth.CLIENT_IDS)
+        self.assertIn("Production", ETaxAuth.CLIENT_IDS)
+        self.assertEqual(ETaxAuth.CLIENT_IDS["Staging"], "etax-gui")
         self.assertEqual(ETaxAuth.GRANT_TYPE, "password")
 
 
