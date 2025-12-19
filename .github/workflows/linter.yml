@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   linter:
-    name: 'Code Linter'
+    name: 'Frappe Linter'
     runs-on: ubuntu-latest
 
     steps:

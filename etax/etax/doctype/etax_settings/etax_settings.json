@@ -19,6 +19,12 @@
   "column_break_auth",
   "ne_key",
   "org_regno",
+  "certificate_section",
+  "certificate_file",
+  "certificate_password",
+  "column_break_cert",
+  "certificate_expiry",
+  "cert_expiry_alert_days",
   "api_section",
   "api_base_url",
   "column_break_api",
@@ -171,6 +177,45 @@
   {
    "collapsible": 1,
    "collapsed": 1,
+   "fieldname": "certificate_section",
+   "fieldtype": "Section Break",
+   "label": "Digital Certificate",
+   "collapsible_depends_on": "eval:0",
+   "description": "Digital certificate for eTax signing (required for report submission)"
+  },
+  {
+   "fieldname": "certificate_file",
+   "fieldtype": "Attach",
+   "label": "Certificate File (.p12/.pfx)",
+   "description": "Upload your digital signing certificate in PKCS#12 format"
+  },
+  {
+   "fieldname": "certificate_password",
+   "fieldtype": "Password",
+   "label": "Certificate Password",
+   "description": "Password to unlock the certificate file"
+  },
+  {
+   "fieldname": "column_break_cert",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "certificate_expiry",
+   "fieldtype": "Date",
+   "label": "Certificate Expiry",
+   "read_only": 1,
+   "description": "Certificate expiration date (auto-detected from certificate)"
+  },
+  {
+   "default": "30",
+   "fieldname": "cert_expiry_alert_days",
+   "fieldtype": "Int",
+   "label": "Alert Days Before Expiry",
+   "description": "Send email alert this many days before certificate expires"
+  },
+  {
+   "collapsible": 1,
+   "collapsed": 1,
    "fieldname": "api_section",
    "fieldtype": "Section Break",
    "label": "API Connection",
@@ -250,20 +295,21 @@
    "collapsible_depends_on": "eval:0",
    "fieldname": "autopilot_section",
    "fieldtype": "Section Break",
-   "label": "Autopilot"
+   "label": "Data Preparation",
+   "description": "Automate data preparation. Note: All reports require approval before submission."
   },
   {
    "default": "0",
-   "description": "Enable fully automated VAT reporting. VAT returns will be filled and submitted automatically.",
+   "description": "Enable automated data preparation. Reports still require approval workflow (Preparer → Reviewer → Approver) before submission to MTA.",
    "fieldname": "autopilot_enabled",
    "fieldtype": "Check",
-   "label": "Enable Autopilot",
+   "label": "Enable Auto-Preparation",
    "bold": 1
   },
   {
    "default": "1",
    "depends_on": "autopilot_enabled",
-   "description": "Automatically fill VAT return data from Sales/Purchase invoices.",
+   "description": "Automatically fill VAT return data from Sales/Purchase invoices. Data will be prepared as Draft for review.",
    "fieldname": "auto_fill_vat_returns",
    "fieldtype": "Check",
    "label": "Auto-fill VAT Returns"

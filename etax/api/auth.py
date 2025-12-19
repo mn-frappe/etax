@@ -186,6 +186,7 @@ class ETaxAuth:
                 self._token_expiry = expiry_dt
                 return True
         except Exception:
+            # Fail silently - unable to load cached token is non-fatal, will request new one
             pass
         return False
 
@@ -311,6 +312,7 @@ class ETaxAuth:
             frappe.db.set_single_value("eTax Settings", "token_expiry", None)
             frappe.db.commit()
         except Exception:
+            # Best effort - in-memory and Redis tokens already cleared, DB cleanup is non-critical
             pass
 
 

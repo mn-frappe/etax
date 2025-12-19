@@ -79,7 +79,7 @@ jobs:
                 "prepareCmd": "python .github/scripts/bump_version.py ${nextRelease.version}"
               }],
               ["@semantic-release/git", {
-                "assets": ["CHANGELOG.md", "pyproject.toml"],
+                "assets": ["CHANGELOG.md", "pyproject.toml", "VERSION", "etax/__init__.py"],
                 "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
               }],
               "@semantic-release/github"
@@ -92,27 +92,43 @@ jobs:
           mkdir -p .github/scripts
           cat > .github/scripts/bump_version.py << 'EOF'
           #!/usr/bin/env python3
-          """Bump version in pyproject.toml for semantic-release."""
+          """Bump version in all version files for semantic-release."""
           import re
           import sys
 
           def bump_version(new_version: str) -> None:
-              """Update version in pyproject.toml."""
+              """Update version in pyproject.toml, __init__.py, and VERSION."""
+              # Update pyproject.toml
               with open("pyproject.toml", "r") as f:
                   content = f.read()
-
-              # Update version in [project] section
               content = re.sub(
                   r'^version\s*=\s*"[^"]*"',
                   f'version = "{new_version}"',
                   content,
                   flags=re.MULTILINE
               )
-
               with open("pyproject.toml", "w") as f:
                   f.write(content)
+              print(f"✅ Updated pyproject.toml to {new_version}")
 
-              print(f"✅ Updated version to {new_version}")
+              # Update __init__.py
+              init_file = "etax/__init__.py"
+              with open(init_file, "r") as f:
+                  content = f.read()
+              content = re.sub(
+                  r'^__version__\s*=\s*"[^"]*"',
+                  f'__version__ = "{new_version}"',
+                  content,
+                  flags=re.MULTILINE
+              )
+              with open(init_file, "w") as f:
+                  f.write(content)
+              print(f"✅ Updated {init_file} to {new_version}")
+
+              # Update VERSION file
+              with open("VERSION", "w") as f:
+                  f.write(f"{new_version}\n")
+              print(f"✅ Updated VERSION to {new_version}")
 
           if __name__ == "__main__":
               if len(sys.argv) != 2:

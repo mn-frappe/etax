@@ -1,0 +1,307 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "naming_series:",
+ "creation": "2024-12-19 10:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "reference_doctype",
+  "reference_name",
+  "column_break_ref",
+  "company",
+  "posting_date",
+  "status",
+  "section_party",
+  "customer",
+  "customer_tin",
+  "column_break_party",
+  "supplier",
+  "supplier_tin",
+  "section_vat",
+  "vat_type",
+  "vat_rate",
+  "column_break_vat",
+  "is_return",
+  "return_against",
+  "section_amounts",
+  "vat_amount",
+  "taxable_amount",
+  "column_break_amounts",
+  "total_amount",
+  "section_adjustment",
+  "is_adjustment",
+  "adjustment_type",
+  "remarks",
+  "section_declaration",
+  "etax_declaration",
+  "included_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "ETAX-LNK-.YYYY.-.#####",
+   "reqd": 1,
+   "default": "ETAX-LNK-.YYYY.-.#####"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Reference DocType",
+   "options": "DocType",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference Name",
+   "options": "reference_doctype",
+   "reqd": 1,
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_ref",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Date",
+   "label": "Posting Date",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pending\nIncluded\nSubmitted\nCancelled",
+   "default": "Pending",
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "section_party",
+   "fieldtype": "Section Break",
+   "label": "Party Details"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "label": "Customer",
+   "options": "Customer",
+   "depends_on": "eval:doc.vat_type=='Output'"
+  },
+  {
+   "fieldname": "customer_tin",
+   "fieldtype": "Data",
+   "label": "Customer TIN",
+   "depends_on": "eval:doc.vat_type=='Output'"
+  },
+  {
+   "fieldname": "column_break_party",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier",
+   "depends_on": "eval:doc.vat_type=='Input'"
+  },
+  {
+   "fieldname": "supplier_tin",
+   "fieldtype": "Data",
+   "label": "Supplier TIN",
+   "depends_on": "eval:doc.vat_type=='Input'"
+  },
+  {
+   "fieldname": "section_vat",
+   "fieldtype": "Section Break",
+   "label": "VAT Details"
+  },
+  {
+   "fieldname": "vat_type",
+   "fieldtype": "Select",
+   "label": "VAT Type",
+   "options": "Output\nInput",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Output = Sales VAT (НӨАТ борлуулалт), Input = Purchase VAT (НӨАТ худалдан авалт)"
+  },
+  {
+   "fieldname": "vat_rate",
+   "fieldtype": "Percent",
+   "label": "VAT Rate",
+   "default": "10",
+   "description": "Standard Mongolia VAT rate is 10%"
+  },
+  {
+   "fieldname": "column_break_vat",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "is_return",
+   "fieldtype": "Check",
+   "label": "Is Return/Credit Note",
+   "default": 0
+  },
+  {
+   "fieldname": "return_against",
+   "fieldtype": "Dynamic Link",
+   "label": "Return Against",
+   "options": "reference_doctype",
+   "depends_on": "is_return"
+  },
+  {
+   "fieldname": "section_amounts",
+   "fieldtype": "Section Break",
+   "label": "Amounts"
+  },
+  {
+   "fieldname": "vat_amount",
+   "fieldtype": "Currency",
+   "label": "VAT Amount",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "НӨАТ дүн"
+  },
+  {
+   "fieldname": "taxable_amount",
+   "fieldtype": "Currency",
+   "label": "Taxable Amount",
+   "description": "Amount before VAT (Татвар ногдох дүн)"
+  },
+  {
+   "fieldname": "column_break_amounts",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount",
+   "description": "Amount including VAT"
+  },
+  {
+   "fieldname": "section_adjustment",
+   "fieldtype": "Section Break",
+   "label": "Adjustment Details",
+   "collapsible": 1,
+   "depends_on": "is_adjustment"
+  },
+  {
+   "fieldname": "is_adjustment",
+   "fieldtype": "Check",
+   "label": "Is Adjustment",
+   "default": 0,
+   "description": "Check if this is a manual VAT adjustment"
+  },
+  {
+   "fieldname": "adjustment_type",
+   "fieldtype": "Select",
+   "label": "Adjustment Type",
+   "options": "\nIncrease\nDecrease",
+   "depends_on": "is_adjustment"
+  },
+  {
+   "fieldname": "remarks",
+   "fieldtype": "Small Text",
+   "label": "Remarks"
+  },
+  {
+   "fieldname": "section_declaration",
+   "fieldtype": "Section Break",
+   "label": "Tax Declaration",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "etax_declaration",
+   "fieldtype": "Link",
+   "label": "eTax Declaration",
+   "options": "eTax Report",
+   "description": "Link to the tax declaration this record is included in"
+  },
+  {
+   "fieldname": "included_date",
+   "fieldtype": "Datetime",
+   "label": "Included Date",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "is_submittable": 0,
+ "links": [
+  {
+   "group": "Reference",
+   "link_doctype": "Sales Invoice",
+   "link_fieldname": "reference_name"
+  },
+  {
+   "group": "Reference",
+   "link_doctype": "Purchase Invoice",
+   "link_fieldname": "reference_name"
+  },
+  {
+   "group": "Reference",
+   "link_doctype": "Journal Entry",
+   "link_fieldname": "reference_name"
+  }
+ ],
+ "modified": "2024-12-19 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "eTax",
+ "name": "eTax Invoice Link",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1
+  }
+ ],
+ "sort_field": "posting_date",
+ "sort_order": "DESC",
+ "track_changes": 1,
+ "track_seen": 1
+}

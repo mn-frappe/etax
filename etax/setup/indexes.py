@@ -182,6 +182,7 @@ def analyze_tables():
             try:
                 frappe.db.sql(f"ANALYZE TABLE `{table}`")
             except Exception:
+                # Non-critical optimization - table analysis may fail on some DB engines
                 pass
 
     frappe.db.commit()
