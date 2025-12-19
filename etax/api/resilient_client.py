@@ -104,6 +104,7 @@ class ResilientETaxClient:
                     if self.metrics:
                         self.metrics.gauge("etax_certificate_days_remaining", days_remaining)
         except Exception:
+            # Certificate monitoring is non-critical - don't let it affect API calls
             pass
     
     def _categorize_error(self, error: Exception) -> str:

@@ -12,7 +12,6 @@ import time
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 
 import frappe
 
@@ -38,6 +37,7 @@ class MetricsCollector:
             current = frappe.cache().get_value(key) or 0
             frappe.cache().set_value(key, current + value, expires_in_sec=self.DEFAULT_TTL)
         except Exception:
+            # Metrics are non-critical - fail silently if cache unavailable
             pass
     
     def gauge(self, name: str, value: float, tags: dict | None = None):
@@ -46,6 +46,7 @@ class MetricsCollector:
         try:
             frappe.cache().set_value(key, data, expires_in_sec=self.DEFAULT_TTL)
         except Exception:
+            # Metrics are non-critical - fail silently if cache unavailable
             pass
     
     def timing(self, name: str, duration_ms: float, tags: dict | None = None):
@@ -56,6 +57,7 @@ class MetricsCollector:
             timings = timings[-100:]
             frappe.cache().set_value(key, timings, expires_in_sec=self.DEFAULT_TTL)
         except Exception:
+            # Metrics are non-critical - fail silently if cache unavailable
             pass
     
     @contextmanager

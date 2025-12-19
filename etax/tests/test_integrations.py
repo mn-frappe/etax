@@ -13,7 +13,7 @@ These are pure unit tests that mock Frappe dependencies.
 """
 
 import unittest
-from unittest.mock import MagicMock, patch, PropertyMock
+from unittest.mock import MagicMock
 import sys
 
 # Create mock frappe module BEFORE any imports

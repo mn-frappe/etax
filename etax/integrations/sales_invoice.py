@@ -10,7 +10,7 @@ Creates eTax Invoice Link records to track which invoices are included in which 
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate, get_datetime
+from frappe.utils import flt
 
 
 def on_submit(doc, method=None):
@@ -169,7 +169,6 @@ def _extract_vat_from_invoice(doc):
         dict: VAT data with vat_amount, taxable_amount, total_amount, vat_rate
     """
     vat_amount = flt(0)
-    taxable_amount = flt(0)
     vat_rate = flt(10)  # Default Mongolia VAT rate
     
     # Method 1: Check taxes table for VAT

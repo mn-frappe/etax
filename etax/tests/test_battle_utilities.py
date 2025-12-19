@@ -3,7 +3,6 @@ Battle Tests for eTax Utility Infrastructure
 Run with: bench run-tests --app etax --module etax.tests.test_battle_utilities
 """
 
-import frappe
 from frappe.tests.utils import FrappeTestCase
 
 
@@ -49,6 +48,7 @@ class TestResilienceModule(FrappeTestCase):
             try:
                 failing_func()
             except ValueError:
+                # Expected - we're testing that circuit breaker tracks failures
                 pass
         
         self.assertEqual(cb.state, CircuitState.OPEN)

@@ -320,9 +320,10 @@ def validate_certificate(cert_data: dict) -> ValidationResult:
             expiry = datetime.strptime(cert_data["cert_expiry"], "%Y-%m-%d").date()
             v.field("cert_expiry", cert_data["cert_expiry"]).custom(
                 lambda x: expiry > date.today(),
-                _("Certificate has expired")
+                _( "Certificate has expired")
             )
         except ValueError:
+            # Date parsing failed - validation will catch invalid date format elsewhere
             pass
     
     return v.validate()

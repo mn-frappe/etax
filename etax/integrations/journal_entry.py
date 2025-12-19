@@ -13,7 +13,7 @@ This handles:
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate
+from frappe.utils import flt
 
 
 def on_submit(doc, method=None):

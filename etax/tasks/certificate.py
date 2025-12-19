@@ -16,7 +16,7 @@ This module handles:
 
 import frappe
 from frappe import _
-from frappe.utils import add_days, getdate, now_datetime, date_diff, cint
+from frappe.utils import getdate, date_diff, cint
 
 
 def check_certificate_expiry():

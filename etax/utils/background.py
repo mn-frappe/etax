@@ -8,7 +8,7 @@ Background Job Utilities for eTax
 Provides async job wrappers with retry logic for non-blocking tax report operations.
 """
 
-from typing import Any, Callable
+from typing import Callable
 
 import frappe
 from frappe import _
@@ -119,6 +119,7 @@ def _notify_job_failure(method: str, error: str, kwargs: dict):
                 user=admin
             )
     except Exception:
+        # Fail silently - notification is non-critical and should not affect job execution
         pass
 
 
@@ -210,6 +211,7 @@ def get_job_status(job_id: str) -> dict:
                 "error": str(job.exc_info) if job.is_failed else None
             }
     except Exception:
+        # Job lookup may fail if job ID is invalid or Redis unavailable
         pass
     
     return {"id": job_id, "status": "unknown"}

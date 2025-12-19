@@ -10,7 +10,7 @@ Input VAT can be claimed as credit against Output VAT in VAT returns.
 
 import frappe
 from frappe import _
-from frappe.utils import flt, getdate
+from frappe.utils import flt
 
 
 def on_submit(doc, method=None):
@@ -169,7 +169,6 @@ def _extract_vat_from_invoice(doc):
         dict: VAT data with vat_amount, taxable_amount, total_amount, vat_rate
     """
     vat_amount = flt(0)
-    taxable_amount = flt(0)
     vat_rate = flt(10)  # Default Mongolia VAT rate
     
     # Method 1: Check taxes table for VAT
@@ -198,6 +197,7 @@ def _extract_vat_from_invoice(doc):
                     vat_rate = flt(tax.rate) or 10
                     vat_amount = flt(doc.grand_total) * vat_rate / (100 + vat_rate)
         except Exception:
+            # Tax template may not exist or be inaccessible - continue with manual calculation
             pass
     
     # Calculate taxable amount
