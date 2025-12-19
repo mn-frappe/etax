@@ -151,6 +151,12 @@ jobs:
         env:
           TYPE: server
 
+      - name: Run Battle Tests
+        working-directory: /home/runner/frappe-bench
+        run: |
+          bench --site test_site run-tests --app etax --module etax.tests.test_battle_utilities
+        continue-on-error: true
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
